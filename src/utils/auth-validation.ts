@@ -12,6 +12,14 @@ export function validateEmail(email: string): string | undefined {
   return undefined
 }
 
+export function validatePasswordRequired(password: string): string | undefined {
+  if (!password) {
+    return "Le mot de passe est requis."
+  }
+
+  return undefined
+}
+
 export function validatePassword(password: string): string | undefined {
   if (!password) {
     return "Le mot de passe est requis."
