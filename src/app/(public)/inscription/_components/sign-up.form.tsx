@@ -81,7 +81,7 @@ export function SignUpForm() {
     <form className="flex flex-col gap-8" onSubmit={handleSubmit} noValidate>
       <AuthFormHeader
         title="Créer votre compte"
-        description="Rejoignez la plateforme Help Desk CCMT."
+        description="Rejoignez la plateforme Help Desk ."
       />
 
       <FieldGroup>

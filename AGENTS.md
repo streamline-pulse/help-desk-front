@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # Contexte du projet
 
 - **Nom** : Help Desk Front
-- **Objectif** : Interface frontend de la plateforme Help Desk CCMT.
+- **Objectif** : Interface frontend de la plateforme Help Desk .
 - **Framework** : Next.js (App Router)
 - **Langage** : TypeScript
 - **Gestionnaire de paquets** : pnpm

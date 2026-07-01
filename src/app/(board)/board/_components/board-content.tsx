@@ -1,35 +1,23 @@
 "use client"
 
-import { useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
-import { Spinner } from "@/components/ui/spinner"
 import { routes } from "@/config/routes"
 import { useAuth } from "@/hooks/use-auth"
 
-export function HomeContent() {
+export function BoardContent() {
   const router = useRouter()
-  const { session, isAuthenticated, signOut } = useAuth()
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace(routes.auth.signIn)
-    }
-  }, [isAuthenticated, router])
+  const { session, signOut } = useAuth()
 
   function handleSignOut() {
     signOut()
     router.push(routes.auth.signIn)
   }
 
-  if (!isAuthenticated || !session) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center">
-        <Spinner className="size-6" />
-      </div>
-    )
+  if (!session) {
+    return null
   }
 
   return (
@@ -42,19 +30,17 @@ export function HomeContent() {
         <span className="font-medium text-foreground">{session.email}</span>.
       </p>
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <Button size="lg">Accéder au tableau de bord</Button>
+        <Button
+          nativeButton={false}
+          size="lg"
+          render={<Link href={routes.dashboard} />}
+        >
+          Accéder au tableau de bord
+        </Button>
         <Button variant="outline" size="lg" onClick={handleSignOut}>
           Se déconnecter
         </Button>
       </div>
-      <p className="text-sm text-muted-foreground">
-        <Link
-          href={routes.auth.signIn}
-          className="underline-offset-4 hover:underline"
-        >
-          Page de connexion
-        </Link>
-      </p>
     </div>
   )
 }

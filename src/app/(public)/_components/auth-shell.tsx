@@ -18,7 +18,7 @@ export function AuthShell({ children, className }: AuthShellProps) {
             href={routes.home}
             className="font-heading text-sm font-semibold text-foreground"
           >
-            Help Desk CCMT
+            Help Desk 
           </Link>
         </header>
 

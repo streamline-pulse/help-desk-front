@@ -47,7 +47,7 @@ export function SignInForm() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace(routes.home)
+      router.replace(routes.board)
     }
   }, [isAuthenticated, router])
 
@@ -78,14 +78,14 @@ export function SignInForm() {
     }
 
     toast.success("Connexion réussie.")
-    router.push(routes.home)
+    router.push(routes.board)
   }
 
   return (
     <form className="flex flex-col gap-8" onSubmit={handleSubmit} noValidate>
       <AuthFormHeader
         title="Connexion"
-        description="Accédez à votre espace Help Desk CCMT."
+        description="Accédez à votre espace Help Desk ."
       />
 
       <FieldGroup>
