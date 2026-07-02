@@ -3,7 +3,8 @@
 import Link from "next/link"
 import * as React from "react"
 
-import { NavMain } from "@/components/nav-main"
+import { NavMain } from "@/components/shared/navigation/nav-main"
+import { NavUser } from "@/components/shared/navigation/nav-user"
 import {
   Sidebar,
   SidebarContent,
@@ -17,7 +18,6 @@ import { navigationItems } from "@/config/navigation-items"
 import { routes } from "@/config/routes"
 import { useAuth } from "@/hooks/use-auth"
 import { IconHeadset } from "@tabler/icons-react"
-import { NavUser } from "./shared/navigation/nav-user"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { session } = useAuth()

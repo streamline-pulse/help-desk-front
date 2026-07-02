@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { toast } from "sonner"
 
-import { BoardSearchCommand } from "@/components/board-search-command"
+import { BoardSearchCommand } from "@/components/shared/navigation/board-search-command"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,17 +15,26 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Kbd } from "@/components/ui/kbd"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { routes } from "@/config/routes"
-import { useAuth } from "@/hooks/use-auth"
 import {
   IconChevronDown,
+  IconClock,
+  IconCopy,
   IconDots,
+  IconLayoutDashboard,
   IconLayoutSidebar,
   IconLink,
+  IconRefresh,
   IconSearch,
   IconStar,
 } from "@tabler/icons-react"
@@ -52,29 +62,50 @@ function getBreadcrumbs(pathname: string) {
   ]
 }
 
-function getInitials(email: string | undefined) {
-  if (!email) {
-    return "KR"
-  }
+function DigitalClock() {
+  const [time, setTime] = useState("--:--")
 
-  const localPart = email.split("@")[0] ?? ""
-  const parts = localPart.split(/[._-]/).filter(Boolean)
+  useEffect(() => {
+    const formatter = new Intl.DateTimeFormat("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+    const updateTime = () => setTime(formatter.format(new Date()))
 
-  if (parts.length >= 2) {
-    return `${parts[0]?.[0] ?? ""}${parts[1]?.[0] ?? ""}`.toUpperCase()
-  }
+    updateTime()
+    const intervalId = window.setInterval(updateTime, 30_000)
 
-  return localPart.slice(0, 2).toUpperCase() || "KR"
+    return () => window.clearInterval(intervalId)
+  }, [])
+
+  return (
+    <span
+      className="hidden h-7 items-center gap-1.5 px-1 text-sm font-medium text-muted-foreground tabular-nums lg:inline-flex"
+      aria-label={`Heure actuelle : ${time}`}
+    >
+      <IconClock className="size-4" aria-hidden="true" />
+      <time>{time}</time>
+    </span>
+  )
 }
 
 export function SiteHeader() {
   const pathname = usePathname()
+  const router = useRouter()
   const { toggleSidebar } = useSidebar()
-  const { session } = useAuth()
   const [searchOpen, setSearchOpen] = useState(false)
   const breadcrumbs = getBreadcrumbs(pathname)
   const isEmployeesPage = pathname === routes.board.employees
-  const initials = getInitials(session?.email)
+
+  async function handleCopyPageLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      toast.success("Lien de la page copié")
+    } catch {
+      toast.error("Impossible de copier le lien")
+    }
+  }
 
   return (
     <>
@@ -117,20 +148,19 @@ export function SiteHeader() {
 
           <div className="ml-auto flex shrink-0 items-center gap-2">
             <Button
-              variant="outline"
-              size="sm"
-              className="hidden h-8 gap-2 text-muted-foreground md:inline-flex"
+              variant="secondary"
+              className="hidden w-64 justify-start text-muted-foreground lg:inline-flex"
               onClick={() => setSearchOpen(true)}
             >
               <IconSearch data-icon="inline-start" />
-              Search
-              <Kbd className="bg-transparent">⌘K</Kbd>
+              <span className="truncate">Rechercher</span>
+              <Kbd className="ml-auto bg-background/60">⌘K</Kbd>
             </Button>
             <Button
               variant="ghost"
               size="icon-sm"
-              className="size-8 text-muted-foreground md:hidden"
-              aria-label="Search"
+              className="size-8 text-muted-foreground lg:hidden"
+              aria-label="Rechercher"
               onClick={() => setSearchOpen(true)}
             >
               <IconSearch />
@@ -138,38 +168,54 @@ export function SiteHeader() {
 
             {isEmployeesPage ? (
               <>
-                <span className="hidden text-[13px] text-neutral-400 lg:inline">
-                  Edited 23 min ago
-                </span>
+                <DigitalClock />
                 <Button
                   size="sm"
                   className="h-7 gap-1.5 rounded-md bg-neutral-900 px-3 text-[13px] font-medium text-white hover:bg-neutral-800"
                 >
                   <IconLink data-icon="inline-start" />
-                  Share
+                  Partager
                   <IconChevronDown data-icon="inline-end" />
                 </Button>
-                <Avatar size="sm" className="size-7">
-                  <AvatarFallback className="bg-sky-100 text-[11px] font-medium text-sky-700">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
                 <Button
                   variant="ghost"
                   size="icon-sm"
                   className="size-7 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700"
-                  aria-label="Favorite"
+                  aria-label="Ajouter aux favoris"
                 >
                   <IconStar />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="size-7 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700"
-                  aria-label="More options"
-                >
-                  <IconDots />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="size-7 text-muted-foreground"
+                        aria-label="Plus d’options"
+                      />
+                    }
+                  >
+                    <IconDots />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                    <DropdownMenuItem onClick={() => router.refresh()}>
+                      <IconRefresh />
+                      Actualiser la page
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleCopyPageLink}>
+                      <IconCopy />
+                      Copier le lien
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => router.push(routes.board.root)}
+                    >
+                      <IconLayoutDashboard />
+                      Vue d’ensemble
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : null}
           </div>

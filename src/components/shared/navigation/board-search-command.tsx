@@ -15,7 +15,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command"
 import { routes } from "@/config/routes"
-import { IconUsers } from "@tabler/icons-react"
+import { IconLayoutDashboard, IconUsers } from "@tabler/icons-react"
 
 type BoardSearchCommandProps = {
   open: boolean
@@ -51,14 +51,14 @@ export function BoardSearchCommand({
     <CommandDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Search"
-      description="Search employees and pages"
+      title="Recherche"
+      description="Rechercher une page ou un employé"
     >
       <Command>
-        <CommandInput placeholder="Search employees, departments..." />
+        <CommandInput placeholder="Rechercher une page ou un employé…" />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Pages">
+          <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
+          <CommandGroup heading="Navigation">
             <CommandItem
               value="employees employee management"
               onSelect={() => {
@@ -67,7 +67,7 @@ export function BoardSearchCommand({
               }}
             >
               <IconUsers />
-              Employee Management
+              Gestion des employés
               <CommandShortcut>↵</CommandShortcut>
             </CommandItem>
             <CommandItem
@@ -77,10 +77,11 @@ export function BoardSearchCommand({
                 router.push(routes.board.root)
               }}
             >
-              Board
+              <IconLayoutDashboard />
+              Vue d’ensemble
             </CommandItem>
           </CommandGroup>
-          <CommandGroup heading="Employees">
+          <CommandGroup heading="Employés">
             {employees.map((employee) => (
               <CommandItem
                 key={employee.id}
