@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { IconEye, IconEyeOff } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -29,6 +29,7 @@ import {
   validateEmail,
   validatePasswordRequired,
 } from "@/utils/auth-validation"
+import { getSafeCallbackUrl } from "@/utils/auth-redirect"
 
 type FormErrors = {
   email?: string
@@ -38,7 +39,9 @@ type FormErrors = {
 
 export function SignInForm() {
   const router = useRouter()
-  const { isAuthenticated } = useAuth()
+  const searchParams = useSearchParams()
+  const { isAuthenticated, isHydrated } = useAuth()
+  const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"))
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -46,10 +49,10 @@ export function SignInForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace(routes.board)
+    if (isHydrated && isAuthenticated) {
+      router.replace(callbackUrl)
     }
-  }, [isAuthenticated, router])
+  }, [callbackUrl, isAuthenticated, isHydrated, router])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -78,7 +81,7 @@ export function SignInForm() {
     }
 
     toast.success("Connexion réussie.")
-    router.push(routes.board)
+    router.push(callbackUrl)
   }
 
   return (

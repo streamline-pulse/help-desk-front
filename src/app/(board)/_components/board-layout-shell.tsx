@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 import { Spinner } from "@/components/ui/spinner"
 import { routes } from "@/config/routes"
@@ -13,15 +13,19 @@ type BoardLayoutShellProps = {
 
 export function BoardLayoutShell({ children }: BoardLayoutShellProps) {
   const router = useRouter()
-  const { isAuthenticated } = useAuth()
+  const pathname = usePathname()
+  const { isAuthenticated, isHydrated } = useAuth()
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace(routes.auth.signIn)
+    if (!isHydrated || isAuthenticated) {
+      return
     }
-  }, [isAuthenticated, router])
 
-  if (!isAuthenticated) {
+    const callbackUrl = encodeURIComponent(pathname)
+    router.replace(`${routes.auth.signIn}?callbackUrl=${callbackUrl}`)
+  }, [isAuthenticated, isHydrated, pathname, router])
+
+  if (!isHydrated || !isAuthenticated) {
     return (
       <div className="flex min-h-dvh items-center justify-center">
         <Spinner className="size-6" />

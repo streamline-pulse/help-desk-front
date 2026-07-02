@@ -1,6 +1,9 @@
 export const routes = {
   home: "/",
-  board: "/board",
+  board: {
+    root: "/board",
+    employees: "/board/employees",
+  },
 
   auth: {
     signIn: "/connexion",

@@ -33,9 +33,9 @@ export function BoardContent() {
         <Button
           nativeButton={false}
           size="lg"
-          render={<Link href={routes.dashboard} />}
+          render={<Link href={routes.board.employees} />}
         >
-          Accéder au tableau de bord
+          Employee Management
         </Button>
         <Button variant="outline" size="lg" onClick={handleSignOut}>
           Se déconnecter
