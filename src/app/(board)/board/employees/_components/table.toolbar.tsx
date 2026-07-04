@@ -91,7 +91,7 @@ function FilterPopover({ table }: { table: Table<Employee> }) {
           </Button>
         }
       />
-      <PopoverContent align="end" className="w-80 gap-4 p-3">
+      <PopoverContent align="end" className="w-60 gap-3 p-3">
         <PopoverHeader>
           <PopoverTitle>Filtres</PopoverTitle>
         </PopoverHeader>

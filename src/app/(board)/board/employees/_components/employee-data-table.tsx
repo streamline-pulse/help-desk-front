@@ -17,17 +17,14 @@ import {
 } from "@tanstack/react-table"
 import {
   IconBriefcase,
-  IconCalendar,
+  IconBuilding,
+  IconCalendarEvent,
+  IconCertificate,
   IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
   IconChevronUp,
-  IconHash,
-  IconId,
+  IconClock,
   IconMail,
-  IconSchool,
   IconUser,
-  IconUsers,
 } from "@tabler/icons-react"
 
 import { DepartmentLabel } from "@/app/(board)/board/employees/_components/department-label"
@@ -36,16 +33,10 @@ import {
   type Employee,
 } from "@/app/(board)/board/employees/_components/employee-mock-data"
 import { EmploymentStatusBadge } from "@/app/(board)/board/employees/_components/employment-status-badge"
+import { TablePagination } from "@/app/(board)/board/employees/_components/table.pagination"
 import { TableToolbar } from "@/app/(board)/board/employees/_components/table.toolbar"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -54,25 +45,44 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { cn } from "@/lib/utils"
+
+function getColumnCellClassName(columnId: string) {
+  if (columnId === "select") {
+    return "w-8 py-2 pl-3 pr-1"
+  }
+
+  if (columnId === "id") {
+    return "py-2 pl-2 pr-3"
+  }
+
+  return "px-3 py-2"
+}
 
 function ColumnHeader({
   icon: Icon,
   label,
   sorted,
 }: {
-  icon: React.ComponentType<{ className?: string; stroke?: number }>
+  icon?: React.ComponentType<{ className?: string; stroke?: number }>
   label: string
   sorted: false | "asc" | "desc"
 }) {
   return (
-    <span className="inline-flex items-center gap-1.5">
-      <Icon className="size-3.5 text-muted-foreground" stroke={1.75} />
-      <span>{label}</span>
+    <span className="inline-flex min-w-0 items-center gap-1.5 text-sm">
+      {Icon ? (
+        <Icon
+          className="size-3.5 shrink-0 text-foreground"
+          stroke={1.75}
+          aria-hidden
+        />
+      ) : null}
+      <span className="truncate font-medium text-foreground">{label}</span>
       {sorted === "asc" ? (
-        <IconChevronUp className="size-3.5 text-muted-foreground" />
+        <IconChevronUp className="size-3.5 shrink-0 text-foreground" />
       ) : null}
       {sorted === "desc" ? (
-        <IconChevronDown className="size-3.5 text-muted-foreground" />
+        <IconChevronDown className="size-3.5 shrink-0 text-foreground" />
       ) : null}
     </span>
   )
@@ -83,9 +93,9 @@ const columns: ColumnDef<Employee>[] = [
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+        checked={table.getIsAllPageRowsSelected()}
+        indeterminate={
+          table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()
         }
         onCheckedChange={(checked) =>
           table.toggleAllPageRowsSelected(Boolean(checked))
@@ -106,13 +116,17 @@ const columns: ColumnDef<Employee>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => (
-      <ColumnHeader icon={IconUsers} label="Matricule" sorted={column.getIsSorted()} />
+      <ColumnHeader label="Matricule" sorted={column.getIsSorted()} />
     ),
   },
   {
     accessorKey: "department",
     header: ({ column }) => (
-      <ColumnHeader icon={IconId} label="Département" sorted={column.getIsSorted()} />
+      <ColumnHeader
+        icon={IconBuilding}
+        label="Département"
+        sorted={column.getIsSorted()}
+      />
     ),
     cell: ({ row }) => <DepartmentLabel department={row.original.department} />,
   },
@@ -134,7 +148,7 @@ const columns: ColumnDef<Employee>[] = [
   {
     accessorKey: "years",
     header: ({ column }) => (
-      <ColumnHeader icon={IconHash} label="Ancienneté" sorted={column.getIsSorted()} />
+      <ColumnHeader icon={IconClock} label="Ancienneté" sorted={column.getIsSorted()} />
     ),
     cell: ({ row }) => (
       <span className="tabular-nums">{row.original.years} ans</span>
@@ -155,7 +169,11 @@ const columns: ColumnDef<Employee>[] = [
   {
     accessorKey: "startDate",
     header: ({ column }) => (
-      <ColumnHeader icon={IconCalendar} label="Date d’entrée" sorted={column.getIsSorted()} />
+      <ColumnHeader
+        icon={IconCalendarEvent}
+        label="Date d’entrée"
+        sorted={column.getIsSorted()}
+      />
     ),
     cell: ({ row }) => (
       <span className="tabular-nums">
@@ -166,7 +184,11 @@ const columns: ColumnDef<Employee>[] = [
   {
     accessorKey: "education",
     header: ({ column }) => (
-      <ColumnHeader icon={IconSchool} label="Formation" sorted={column.getIsSorted()} />
+      <ColumnHeader
+        icon={IconCertificate}
+        label="Formation"
+        sorted={column.getIsSorted()}
+      />
     ),
   },
 ]
@@ -206,23 +228,28 @@ export function EmployeeDataTable() {
     },
   })
   const filteredCount = table.getFilteredRowModel().rows.length
-  const totalCount = table.getCoreRowModel().rows.length
 
   return (
     <div className="pb-10">
       <TableToolbar table={table} />
       <div className="px-6">
         <div className="overflow-hidden rounded-lg border">
-          <Table>
+          <Table className="[&_td:not(:first-child)]:border-r [&_td:not(:first-child)]:border-border [&_td:last-child]:border-r-0 [&_th:not(:first-child)]:border-r [&_th:not(:first-child)]:border-border [&_th:last-child]:border-r-0">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="bg-muted/40 hover:bg-muted/40">
+                <TableRow key={headerGroup.id} className="bg-muted/30 hover:bg-muted/30">
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="h-10 px-3 text-xs font-medium">
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        "h-10 border-b text-sm",
+                        getColumnCellClassName(header.column.id)
+                      )}
+                    >
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <button
                           type="button"
-                          className="flex h-full w-full cursor-pointer items-center text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="flex h-full w-full cursor-pointer items-center text-left text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           onClick={header.column.getToggleSortingHandler()}
                         >
                           {flexRender(
@@ -250,7 +277,10 @@ export function EmployeeDataTable() {
                     className="data-[state=selected]:bg-muted"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-3 py-2 text-sm">
+                      <TableCell
+                        key={cell.id}
+                        className={cn("text-sm", getColumnCellClassName(cell.column.id))}
+                      >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
@@ -282,56 +312,7 @@ export function EmployeeDataTable() {
           </Table>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 py-3">
-          <p className="text-sm text-muted-foreground tabular-nums">
-            {filteredCount} résultat{filteredCount > 1 ? "s" : ""} sur {totalCount}
-          </p>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="hidden text-sm text-muted-foreground sm:inline">
-                Lignes par page
-              </span>
-              <Select
-                value={String(table.getState().pagination.pageSize)}
-                onValueChange={(value) => table.setPageSize(Number(value))}
-              >
-                <SelectTrigger size="sm" aria-label="Lignes par page">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[5, 10, 20].map((pageSize) => (
-                    <SelectItem key={pageSize} value={String(pageSize)}>
-                      {pageSize}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <span className="text-sm tabular-nums">
-              Page {table.getState().pagination.pageIndex + 1} sur {table.getPageCount() || 1}
-            </span>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="icon-sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                aria-label="Page précédente"
-              >
-                <IconChevronLeft />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon-sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                aria-label="Page suivante"
-              >
-                <IconChevronRight />
-              </Button>
-            </div>
-          </div>
-        </div>
+        {filteredCount > 0 ? <TablePagination table={table} /> : null}
       </div>
     </div>
   )

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import * as React from "react"
 
-import { NavMain } from "@/components/nav-main"
+import { NavMain } from "@/components/shared/navigation/nav-main"
 import {
   Sidebar,
   SidebarContent,
