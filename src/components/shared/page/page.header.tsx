@@ -14,9 +14,9 @@ export function PageHeader({
   icon: Icon,
 }: PageHeaderProps) {
   return (
-    <header className="px-6 pt-10 pb-2">
-      <div className="mb-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-        {Icon ? <Icon className="size-3.5" stroke={1.75} /> : null}
+    <header className="px-6 pt-10 pb-8">
+      <div className="mb-2 flex items-center gap-1 text-xs text-muted-foreground">
+        {Icon ? <Icon className="size-3" stroke={1.75} /> : null}
         <span>{label}</span>
       </div>
       <h1 className="text-3xl leading-tight font-semibold text-balance text-foreground">

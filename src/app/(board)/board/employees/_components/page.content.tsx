@@ -1,5 +1,4 @@
 import { EmployeeDataTable } from "@/app/(board)/board/employees/_components/employee-data-table"
-import { EmployeeTabsToolbar } from "@/app/(board)/board/employees/_components/employee-tabs-toolbar"
 import { PageHeader } from "@/components/shared/page/page.header"
 import { IconLock } from "@tabler/icons-react"
 
@@ -12,7 +11,6 @@ export function PageContent() {
         description="Employee tracking across all departments, salaries, responsibilities, and termination"
         icon={IconLock}
       />
-      <EmployeeTabsToolbar />
       <EmployeeDataTable />
     </div>
   )
