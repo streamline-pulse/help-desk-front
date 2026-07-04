@@ -3,8 +3,9 @@ import { Figtree, Geist_Mono, Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils";
-import { Toaster } from "sonner";
+import { cn } from "@/lib/utils"
+import { QueryProvider } from "@/provider/query.provider"
+import { Toaster } from "sonner"
 
 const interHeading = Inter({subsets:['latin'],variable:'--font-heading'});
 
@@ -27,10 +28,12 @@ export default function RootLayout({
       className={cn("antialiased", fontMono.variable, "font-sans", figtree.variable, interHeading.variable)}
     >
       <body>
-        <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
-          <Toaster />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+            <Toaster />
+          </ThemeProvider>
+        </QueryProvider>
 
       </body>
     </html>

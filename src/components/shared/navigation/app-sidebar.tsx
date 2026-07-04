@@ -16,15 +16,15 @@ import {
 } from "@/components/ui/sidebar"
 import { navigationItems } from "@/config/navigation-items"
 import { routes } from "@/config/routes"
-import { useAuth } from "@/hooks/use-auth"
+import { useCurrentUserQuery } from "@/hooks/queries/use-auth.query"
 import { IconHeadset } from "@tabler/icons-react"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { session } = useAuth()
+  const { data: user } = useCurrentUserQuery()
 
-  const user = {
-    name: session?.email?.split("@")[0] ?? "User",
-    email: session?.email ?? "user@example.com",
+  const navigationUser = {
+    name: user ? `${user.firstName} ${user.lastName}`.trim() : "Utilisateur",
+    email: user?.email ?? "",
     avatar: "",
   }
 
@@ -55,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={navigationItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser user={navigationUser} />
       </SidebarFooter>
     </Sidebar>
   )

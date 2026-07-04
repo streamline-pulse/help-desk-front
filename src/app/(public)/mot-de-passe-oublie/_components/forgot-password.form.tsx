@@ -1,89 +1,58 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useForm } from "@tanstack/react-form"
 
 import { AuthFormHeader } from "@/app/(public)/_components/auth-form-header"
 import { Button } from "@/components/ui/button"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { routes } from "@/config/routes"
-import { validateEmail } from "@/utils/auth-validation"
+import { useForgotPasswordMutation } from "@/hooks/queries/use-auth.query"
+import { forgotPasswordSchema } from "@/schemas/forgot-password.schema"
+import { focusFirstInvalidField, getZodFormErrors, type FormErrors } from "@/utils/form-validation"
 
-type FormErrors = {
-  email?: string
-}
+const NEUTRAL_MESSAGE = "Si un compte correspond à cette adresse, un message a été envoyé."
 
 export function ForgotPasswordForm() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
+  const mutation = useForgotPasswordMutation()
+  const errorRef = useRef<HTMLDivElement>(null)
   const [errors, setErrors] = useState<FormErrors>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    const nextErrors: FormErrors = {
-      email: validateEmail(email),
-    }
-
-    setErrors(nextErrors)
-
-    if (nextErrors.email) {
-      return
-    }
-
-    setIsSubmitting(true)
-
-    await new Promise((resolve) => setTimeout(resolve, 600))
-
-    router.push(`${routes.auth.verifyOtp}?flow=reset`)
-  }
+  const [successMessage, setSuccessMessage] = useState<string>()
+  const form = useForm({
+    defaultValues: { email: "" },
+    onSubmit: async ({ value }) => {
+      const result = forgotPasswordSchema.safeParse(value)
+      if (!result.success) {
+        const nextErrors = getZodFormErrors(result.error)
+        setErrors(nextErrors)
+        focusFirstInvalidField(nextErrors)
+        return
+      }
+      try {
+        await mutation.mutateAsync(result.data)
+        setSuccessMessage(NEUTRAL_MESSAGE)
+        setErrors({})
+      } catch (error) {
+        setErrors({ form: error instanceof Error ? error.message : "Impossible d’envoyer le message." })
+        requestAnimationFrame(() => errorRef.current?.focus())
+      }
+    },
+  })
 
   return (
-    <form className="flex flex-col gap-8" onSubmit={handleSubmit} noValidate>
-      <AuthFormHeader
-        title="Mot de passe oublié"
-        description="Saisissez votre e-mail pour recevoir un code de vérification."
-      />
-
+    <form className="flex flex-col gap-8" onSubmit={(event) => { event.preventDefault(); void form.handleSubmit() }} noValidate aria-busy={mutation.isPending}>
+      <AuthFormHeader title="Mot de passe oublié" description="Saisissez votre e-mail pour recevoir un lien de réinitialisation." />
       <FieldGroup>
-        <Field data-invalid={!!errors.email}>
-          <FieldLabel htmlFor="forgot-password-email">E-mail</FieldLabel>
-          <Input
-            id="forgot-password-email"
-            type="email"
-            autoComplete="email"
-            placeholder="vous@exemple.fr"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            aria-invalid={!!errors.email}
-          />
-          <FieldError errors={errors.email ? [{ message: errors.email }] : undefined} />
-        </Field>
+        {errors.form ? <div ref={errorRef} tabIndex={-1} role="alert"><FieldError errors={[{ message: errors.form }]} /></div> : null}
+        {successMessage ? <p role="status" className="text-sm text-muted-foreground">{successMessage}</p> : null}
+        <form.Field name="email">{(field) => <Field data-invalid={!!errors.email}><FieldLabel htmlFor="forgot-password-email">E-mail</FieldLabel><Input id="forgot-password-email" name={field.name} type="email" autoComplete="email" required value={field.state.value} onBlur={field.handleBlur} onChange={(event) => { field.handleChange(event.target.value); setErrors({}) }} aria-invalid={!!errors.email} aria-describedby={errors.email ? "forgot-password-email-error" : undefined} /><FieldError id="forgot-password-email-error" errors={errors.email ? [{ message: errors.email }] : undefined} /></Field>}</form.Field>
       </FieldGroup>
-
       <div className="flex flex-col gap-4">
-        <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? <Spinner /> : null}
-          Envoyer le code
-        </Button>
-
-        <p className="text-center text-sm text-pretty text-muted-foreground">
-          <Link
-            href={routes.auth.signIn}
-            className="text-foreground underline-offset-4 hover:underline"
-          >
-            Retour à la connexion
-          </Link>
-        </p>
+        <Button type="submit" size="lg" className="w-full" disabled={mutation.isPending}>{mutation.isPending ? <Spinner /> : null}Envoyer le lien</Button>
+        <p className="text-center text-sm text-muted-foreground"><Link href={routes.auth.signIn} className="text-foreground underline-offset-4 hover:underline">Retour à la connexion</Link></p>
       </div>
     </form>
   )

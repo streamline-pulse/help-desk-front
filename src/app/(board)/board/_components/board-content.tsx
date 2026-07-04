@@ -5,18 +5,23 @@ import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { routes } from "@/config/routes"
-import { useAuth } from "@/hooks/use-auth"
+import {
+  useCurrentUserQuery,
+  useSignOutMutation,
+} from "@/hooks/queries/use-auth.query"
 
 export function BoardContent() {
   const router = useRouter()
-  const { session, signOut } = useAuth()
+  const { data: user } = useCurrentUserQuery()
+  const signOut = useSignOutMutation()
 
-  function handleSignOut() {
-    signOut()
-    router.push(routes.auth.signIn)
+  async function handleSignOut() {
+    await signOut.mutateAsync().catch(() => undefined)
+    router.replace(routes.auth.signIn)
+    router.refresh()
   }
 
-  if (!session) {
+  if (!user) {
     return null
   }
 
@@ -27,7 +32,7 @@ export function BoardContent() {
       </h1>
       <p className="max-w-md text-pretty text-muted-foreground">
         Bienvenue sur la plateforme. Vous êtes connecté en tant que{" "}
-        <span className="font-medium text-foreground">{session.email}</span>.
+        <span className="font-medium text-foreground">{user.email}</span>.
       </p>
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Button
@@ -37,8 +42,8 @@ export function BoardContent() {
         >
           Employee Management
         </Button>
-        <Button variant="outline" size="lg" onClick={handleSignOut}>
-          Se déconnecter
+        <Button variant="outline" size="lg" onClick={handleSignOut} disabled={signOut.isPending}>
+          {signOut.isPending ? "Déconnexion…" : "Se déconnecter"}
         </Button>
       </div>
     </div>

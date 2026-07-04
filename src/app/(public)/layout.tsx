@@ -1,14 +1,18 @@
-import { Toaster } from "@/components/ui/sonner"
+import { redirect } from "next/navigation"
 
-export default function PublicLayout({
+import { routes } from "@/config/routes"
+import { getCurrentUserFromSession } from "@/lib/server-auth"
+
+export default async function PublicLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return (
-    <>
-      {children}
-      <Toaster />
-    </>
-  )
+  const user = await getCurrentUserFromSession()
+
+  if (user?.emailVerified) {
+    redirect(routes.board.root)
+  }
+
+  return children
 }

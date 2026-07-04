@@ -23,7 +23,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { routes } from "@/config/routes"
-import { useAuth } from "@/hooks/use-auth"
+import { useSignOutMutation } from "@/hooks/queries/use-auth.query"
 import {
   IconBell,
   IconCreditCard,
@@ -53,11 +53,12 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const router = useRouter()
-  const { signOut } = useAuth()
+  const signOut = useSignOutMutation()
 
-  function handleSignOut() {
-    signOut()
-    router.push(routes.auth.signIn)
+  async function handleSignOut() {
+    await signOut.mutateAsync().catch(() => undefined)
+    router.replace(routes.auth.signIn)
+    router.refresh()
   }
 
   const initials = getInitials(user.name)
@@ -128,9 +129,12 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={handleSignOut}>
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                disabled={signOut.isPending}
+              >
                 <IconLogout />
-                Log out
+                {signOut.isPending ? "Déconnexion…" : "Se déconnecter"}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
