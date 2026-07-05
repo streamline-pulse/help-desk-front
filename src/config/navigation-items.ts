@@ -66,13 +66,6 @@ export const navigationItems = [
     isReady: true,
   },
   {
-    title: "Configuration",
-    url: routes.board.configuration.root,
-    icon: IconAdjustments,
-    moduleCode: moduleCodes.configuration,
-    isReady: true,
-  },
-  {
     title: "Rôles et permissions",
     url: routes.board.roles.root,
     icon: IconShieldLock,
@@ -84,6 +77,13 @@ export const navigationItems = [
     url: routes.board.groupConfiguration.root,
     icon: IconCategory,
     moduleCode: moduleCodes.groupConfiguration,
+    isReady: true,
+  },
+  {
+    title: "Configuration géographique",
+    url: routes.board.configuration.root,
+    icon: IconAdjustments,
+    moduleCode: moduleCodes.configuration,
     isReady: true,
   },
   {

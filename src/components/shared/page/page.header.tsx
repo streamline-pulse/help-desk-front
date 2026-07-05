@@ -22,7 +22,7 @@ export function PageHeader({
       <h1 className="text-3xl leading-tight font-semibold text-balance text-foreground">
         {title}
       </h1>
-      <p className="mt-1 max-w-2xl text-base leading-relaxed text-pretty text-muted-foreground">
+      <p className="mt-1 max-w-4xl text-base leading-relaxed text-pretty text-muted-foreground">
         {description}
       </p>
     </header>
