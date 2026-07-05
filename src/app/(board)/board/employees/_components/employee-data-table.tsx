@@ -22,12 +22,12 @@ import {
 } from "@/app/(board)/board/employees/_components/employee-mock-data"
 import { EmploymentStatusBadge } from "@/app/(board)/board/employees/_components/employment-status-badge"
 import { departments } from "@/app/(board)/board/employees/_components/table.constants"
-import { DateCell } from "@/components/shared/data-table/cells/date.cell"
-import { DataTable } from "@/components/shared/data-table/data-table"
+import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { DataTable } from "@/components/shared/core-table/core.table"
 import type {
   DataTableColumn,
   DataTableFilter,
-} from "@/components/shared/data-table/data-table.types"
+} from "@/components/shared/core-table/table.types"
 import { Button } from "@/components/ui/button"
 
 type EmployeeFilters = {

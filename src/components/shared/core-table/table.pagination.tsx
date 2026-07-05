@@ -2,7 +2,7 @@
 
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
 
-import { useDataTableContext } from "@/components/shared/data-table/data-table.provider"
+import { useDataTableContext } from "@/components/shared/core-table/table.provider"
 import { Button } from "@/components/ui/button"
 import {
   Pagination,

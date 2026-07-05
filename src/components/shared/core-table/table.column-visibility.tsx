@@ -2,8 +2,8 @@
 
 import { IconColumns3 } from "@tabler/icons-react"
 
-import type { DataTableColumnMeta } from "@/components/shared/data-table/data-table.types"
-import { useDataTableContext } from "@/components/shared/data-table/data-table.provider"
+import type { DataTableColumnMeta } from "@/components/shared/core-table/table.types"
+import { useDataTableContext } from "@/components/shared/core-table/table.provider"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {

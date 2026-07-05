@@ -1,6 +1,6 @@
 import { IconAlertTriangle } from "@tabler/icons-react"
 
-import type { NormalizedApiError } from "@/components/shared/data-table/data-table.types"
+import type { NormalizedApiError } from "@/components/shared/core-table/table.types"
 import { Button } from "@/components/ui/button"
 import {
   Empty,

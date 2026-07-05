@@ -5,7 +5,7 @@ import { useMemo, useState } from "react"
 import type {
   DataTableQueryHook,
   DataTableRequest,
-} from "@/components/shared/data-table/data-table.types"
+} from "@/components/shared/core-table/table.types"
 import { AppApiError } from "@/lib/api-error"
 import { normalizePage } from "@/lib/api-response"
 import type {

@@ -23,7 +23,7 @@ import type {
   DataTableSlots,
   DataTableState,
   NormalizedApiError,
-} from "@/components/shared/data-table/data-table.types"
+} from "@/components/shared/core-table/table.types"
 import { Checkbox } from "@/components/ui/checkbox"
 
 type UseDataTableOptions<TRow, TFilters> = {

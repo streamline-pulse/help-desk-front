@@ -1,6 +1,6 @@
 "use client"
 
-import type { DataTableFilterOption } from "@/components/shared/data-table/data-table.types"
+import type { DataTableFilterOption } from "@/components/shared/core-table/table.types"
 import { Checkbox } from "@/components/ui/checkbox"
 
 export function MultiSelectFilter({

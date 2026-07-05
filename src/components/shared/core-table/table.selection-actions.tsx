@@ -1,6 +1,6 @@
 "use client"
 
-import { useDataTableContext } from "@/components/shared/data-table/data-table.provider"
+import { useDataTableContext } from "@/components/shared/core-table/table.provider"
 import { Button } from "@/components/ui/button"
 
 export function DataTableSelectionActions<TRow, TFilters>() {

@@ -2,18 +2,18 @@
 
 import { useMemo } from "react"
 
-import { DataTableBodyContent } from "@/components/shared/data-table/data-table.body"
-import { DataTableHeader } from "@/components/shared/data-table/data-table.header"
-import { DataTablePagination } from "@/components/shared/data-table/data-table.pagination"
-import { DataTableProvider } from "@/components/shared/data-table/data-table.provider"
-import { DataTableToolbar } from "@/components/shared/data-table/data-table.toolbar"
+import { DataTableBodyContent } from "@/components/shared/core-table/table.body"
+import { DataTableHeader } from "@/components/shared/core-table/table.header"
+import { DataTablePagination } from "@/components/shared/core-table/table.pagination"
+import { DataTableProvider } from "@/components/shared/core-table/table.provider"
+import { DataTableToolbar } from "@/components/shared/core-table/table.toolbar"
 import type {
   ApiPagedResponse,
   DataTableClientProps,
   DataTableController,
   DataTableProps,
   DataTableServerProps,
-} from "@/components/shared/data-table/data-table.types"
+} from "@/components/shared/core-table/table.types"
 import { Spinner } from "@/components/ui/spinner"
 import { Table } from "@/components/ui/table"
 import { useDataTable } from "@/hooks/use-data-table"

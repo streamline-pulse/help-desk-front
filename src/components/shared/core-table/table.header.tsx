@@ -3,8 +3,8 @@
 import { flexRender } from "@tanstack/react-table"
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react"
 
-import { useDataTableContext } from "@/components/shared/data-table/data-table.provider"
-import type { DataTableColumnMeta } from "@/components/shared/data-table/data-table.types"
+import { useDataTableContext } from "@/components/shared/core-table/table.provider"
+import type { DataTableColumnMeta } from "@/components/shared/core-table/table.types"
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 

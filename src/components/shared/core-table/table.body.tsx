@@ -2,12 +2,12 @@
 
 import { flexRender } from "@tanstack/react-table"
 
-import { cellSpacing } from "@/components/shared/data-table/data-table.header"
-import { useDataTableContext } from "@/components/shared/data-table/data-table.provider"
-import type { DataTableColumnMeta } from "@/components/shared/data-table/data-table.types"
-import { DataTableEmpty } from "@/components/shared/data-table/states/data-table.empty"
-import { DataTableError } from "@/components/shared/data-table/states/data-table.error"
-import { DataTableLoading } from "@/components/shared/data-table/states/data-table.loading"
+import { cellSpacing } from "@/components/shared/core-table/table.header"
+import { useDataTableContext } from "@/components/shared/core-table/table.provider"
+import type { DataTableColumnMeta } from "@/components/shared/core-table/table.types"
+import { DataTableEmpty } from "@/components/shared/core-table/states/table.empty"
+import { DataTableError } from "@/components/shared/core-table/states/table.error"
+import { DataTableLoading } from "@/components/shared/core-table/states/table.loading"
 import { TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 

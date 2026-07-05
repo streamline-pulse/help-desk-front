@@ -1,18 +1,18 @@
 "use client"
 
-import type { DataTableFilter as DataTableFilterDefinition } from "@/components/shared/data-table/data-table.types"
-import { BooleanFilter } from "@/components/shared/data-table/filters/boolean-filter"
-import { DateFilter } from "@/components/shared/data-table/filters/date-filter"
+import type { DataTableFilter as DataTableFilterDefinition } from "@/components/shared/core-table/table.types"
+import { BooleanFilter } from "@/components/shared/core-table/filters/boolean.filter"
+import { DateFilter } from "@/components/shared/core-table/filters/date-filter"
 import {
   DateRangeFilter,
   type DateRangeFilterValue,
-} from "@/components/shared/data-table/filters/date-range-filter"
-import { MultiSelectFilter } from "@/components/shared/data-table/filters/multi-select-filter"
+} from "@/components/shared/core-table/filters/date-range.filter"
+import { MultiSelectFilter } from "@/components/shared/core-table/filters/multi-select.filter"
 import {
   NumberRangeFilter,
   type NumberRangeFilterValue,
-} from "@/components/shared/data-table/filters/number-range-filter"
-import { SelectFilter } from "@/components/shared/data-table/filters/select-filter"
+} from "@/components/shared/core-table/filters/number-range.filter"
+import { SelectFilter } from "@/components/shared/core-table/filters/select.filter"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 

@@ -2,12 +2,12 @@
 
 import { IconFilter, IconSearch, IconX } from "@tabler/icons-react"
 
-import { DataTableColumnVisibility } from "@/components/shared/data-table/data-table.column-visibility"
-import { DataTableExport } from "@/components/shared/data-table/data-table.export"
-import { useDataTableContext } from "@/components/shared/data-table/data-table.provider"
-import { DataTableSelectionActions } from "@/components/shared/data-table/data-table.selection-actions"
-import type { DataTableFilter } from "@/components/shared/data-table/data-table.types"
-import { DataTableFilter as FilterControl } from "@/components/shared/data-table/filters/data-table-filter"
+import { DataTableColumnVisibility } from "@/components/shared/core-table/table.column-visibility"
+import { DataTableExport } from "@/components/shared/core-table/table.export"
+import { useDataTableContext } from "@/components/shared/core-table/table.provider"
+import { DataTableSelectionActions } from "@/components/shared/core-table/table.selection-actions"
+import type { DataTableFilter } from "@/components/shared/core-table/table.types"
+import { DataTableFilter as FilterControl } from "@/components/shared/core-table/filters/table.filter"
 import { Button } from "@/components/ui/button"
 import { FieldGroup } from "@/components/ui/field"
 import {

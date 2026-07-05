@@ -8,7 +8,7 @@ import type {
   DataTableColumn,
   DataTableFilter,
   DataTableState,
-} from "@/components/shared/data-table/data-table.types"
+} from "@/components/shared/core-table/table.types"
 
 type UseDataTableStateOptions<TRow, TFilters> = {
   id: string

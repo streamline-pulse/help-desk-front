@@ -8,13 +8,13 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 
-import { DateCell } from "@/components/shared/data-table/cells/date.cell"
-import { DataTable } from "@/components/shared/data-table/data-table"
+import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { DataTable } from "@/components/shared/core-table/core.table"
 import type {
   DataTableColumn,
   DataTableFilter,
   DataTableRequest,
-} from "@/components/shared/data-table/data-table.types"
+} from "@/components/shared/core-table/table.types"
 import type {
   ResourceDataHooks,
   ResourceMutation,

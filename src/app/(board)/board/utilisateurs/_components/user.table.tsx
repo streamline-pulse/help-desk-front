@@ -10,12 +10,12 @@ import {
 
 import { UserForm } from "@/app/(board)/board/utilisateurs/_components/user.form"
 import { GlobalModal } from "@/components/shared/global.modal"
-import { DateCell } from "@/components/shared/data-table/cells/date.cell"
-import { DataTable } from "@/components/shared/data-table/data-table"
+import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { DataTable } from "@/components/shared/core-table/core.table"
 import type {
   DataTableColumn,
   DataTableRequest,
-} from "@/components/shared/data-table/data-table.types"
+} from "@/components/shared/core-table/table.types"
 import {
   AlertDialog,
   AlertDialogAction,

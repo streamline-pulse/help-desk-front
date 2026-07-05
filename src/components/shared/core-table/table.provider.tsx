@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from "react"
 
-import type { DataTableController } from "@/components/shared/data-table/data-table.types"
+import type { DataTableController } from "@/components/shared/core-table/table.types"
 
 const DataTableContext = createContext<unknown>(null)
 

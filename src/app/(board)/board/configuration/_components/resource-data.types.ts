@@ -1,4 +1,4 @@
-import type { DataTableQueryResult } from "@/components/shared/data-table/data-table.types"
+import type { DataTableQueryResult } from "@/components/shared/core-table/table.types"
 import type { ApiListParams, PageResult } from "@/types/api/api-data.type"
 import type {
   ConfigurationEntity,
