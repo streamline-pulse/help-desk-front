@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "@tanstack/react-form"
 import { IconEye, IconEyeOff } from "@tabler/icons-react"
 
-import { AuthFormHeader } from "@/app/(public)/_components/auth-form-header"
+import { AuthFormHeader } from "@/app/(public)/auth/_components/auth-form-header"
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"

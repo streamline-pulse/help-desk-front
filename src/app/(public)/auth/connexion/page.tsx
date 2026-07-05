@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 
-import { AuthShell } from "@/app/(public)/_components/auth-shell"
-import { SignInForm } from "@/app/(public)/connexion/_components/sign-in.form"
+import { AuthShell } from "@/app/(public)/auth/_components/auth-shell"
+import { SignInForm } from "@/app/(public)/auth/connexion/_components/sign-in.form"
 import { Spinner } from "@/components/ui/spinner"
 
 function SignInFallback() {

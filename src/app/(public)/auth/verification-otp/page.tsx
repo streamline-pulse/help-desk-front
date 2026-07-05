@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 
-import { AuthShell } from "@/app/(public)/_components/auth-shell"
-import { OtpVerificationForm } from "@/app/(public)/verification-otp/_components/otp-verification.form"
+import { AuthShell } from "@/app/(public)/auth/_components/auth-shell"
+import { OtpVerificationForm } from "@/app/(public)/auth/verification-otp/_components/otp-verification.form"
 import { Spinner } from "@/components/ui/spinner"
 
 function OtpVerificationFallback() {

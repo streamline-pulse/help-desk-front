@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 
-import { AuthFormHeader } from "@/app/(public)/_components/auth-form-header"
+import { AuthFormHeader } from "@/app/(public)/auth/_components/auth-form-header"
 import { Button } from "@/components/ui/button"
 import { FieldError, FieldGroup } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"

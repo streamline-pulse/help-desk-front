@@ -4,7 +4,7 @@ import { useRef, useState } from "react"
 import Link from "next/link"
 import { useForm } from "@tanstack/react-form"
 
-import { AuthFormHeader } from "@/app/(public)/_components/auth-form-header"
+import { AuthFormHeader } from "@/app/(public)/auth/_components/auth-form-header"
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"

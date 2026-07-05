@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { AuthBrandPanel } from "@/app/(public)/_components/auth-brand-panel"
+import { AuthBrandPanel } from "@/app/(public)/auth/_components/auth-brand-panel"
 import { routes } from "@/config/routes"
 import { cn } from "@/lib/utils"
 

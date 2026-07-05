@@ -18,12 +18,12 @@ export const routes = {
   },
 
   auth: {
-    signIn: "/connexion",
-    signUp: "/inscription",
-    forgotPassword: "/mot-de-passe-oublie",
-    verifyOtp: "/verification-otp",
-    resetPassword: "/reinitialiser-mot-de-passe",
-    acceptInvitation: "/invitation",
+    signIn: "/auth/connexion",
+    signUp: "/auth/inscription",
+    forgotPassword: "/auth/mot-de-passe-oublie",
+    verifyOtp: "/auth/verification-otp",
+    resetPassword: "/auth/reinitialiser-mot-de-passe",
+    acceptInvitation: "/auth/invitation",
   },
 
   dashboard: "/bord",
