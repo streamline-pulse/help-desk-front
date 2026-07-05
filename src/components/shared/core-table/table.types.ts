@@ -13,6 +13,8 @@ import type {
 } from "@/types/api/api-data.type"
 import type { NormalizedApiError } from "@/types/api/api-error.type"
 
+import type { DeleteConfirmationLevel } from "@/components/shared/delete-confirmation.modal"
+
 export type { ApiPagedResponse, NormalizedApiError, PageResult }
 export type DataTableParamValue = ApiListParamValue
 
@@ -41,11 +43,13 @@ export type DataTableColumnMeta = {
   headerClassName?: string
   hideable?: boolean
   exportable?: boolean
+  exportValue?: (row: unknown) => string
 }
 
 export type DataTableColumn<TRow, TValue = unknown> = ColumnDef<TRow, TValue> &
   DataTableColumnMeta & {
     sortable?: boolean
+    exportValue?: (row: TRow) => string
   }
 
 export type DataTableFilterOption = {
@@ -119,8 +123,16 @@ export type DataTableExportContext<TRow, TFilters> = {
 
 export type DataTableExportConfig<TRow, TFilters> = {
   enabled: boolean
+  filename?: string
   label?: string
-  handler: (context: DataTableExportContext<TRow, TFilters>) => Promise<void> | void
+  handler?: (context: DataTableExportContext<TRow, TFilters>) => Promise<void> | void
+}
+
+export type DataTableBulkDeleteConfig<TRow> = {
+  onDelete: (rows: TRow[]) => void | Promise<void>
+  level?: DeleteConfirmationLevel
+  isPending?: boolean
+  onReset?: () => void
 }
 
 export type DataTableSlots = {
@@ -149,6 +161,7 @@ type DataTableCommonProps<TSource, TRow, TFilters> = {
   rowActions?: (row: TRow) => ReactNode
   toolbarActions?: ReactNode
   bulkActions?: DataTableBulkActions<TRow>
+  bulkDelete?: DataTableBulkDeleteConfig<TRow>
   export?: DataTableExportConfig<TRow, TFilters>
   beforeTable?: ReactNode
   slots?: DataTableSlots
@@ -225,6 +238,7 @@ export type DataTableController<TRow, TFilters> = {
   pageSizeOptions: readonly number[]
   toolbarActions?: ReactNode
   bulkActions?: DataTableBulkActions<TRow>
+  bulkDeleteConfig?: DataTableBulkDeleteConfig<TRow>
   beforeTable?: ReactNode
   slots?: DataTableSlots
   ariaLabel: string

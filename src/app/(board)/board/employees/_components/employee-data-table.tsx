@@ -7,7 +7,6 @@ import {
   IconCalendarEvent,
   IconCertificate,
   IconClock,
-  IconDownload,
   IconMail,
   IconPlus,
   IconUser,
@@ -153,27 +152,6 @@ const filters: DataTableFilter<EmployeeFilters>[] = [
   },
 ]
 
-function exportEmployees(rows: Employee[]) {
-  if (rows.length === 0) return
-  const headers = Object.keys(rows[0]) as Array<keyof Employee>
-  const content = [
-    headers.join(","),
-    ...rows.map((employee) =>
-      headers
-        .map((header) => `"${String(employee[header]).replaceAll('"', '""')}"`)
-        .join(",")
-    ),
-  ].join("\n")
-  const url = URL.createObjectURL(
-    new Blob([content], { type: "text/csv;charset=utf-8" })
-  )
-  const link = document.createElement("a")
-  link.href = url
-  link.download = "employes.csv"
-  link.click()
-  URL.revokeObjectURL(url)
-}
-
 export function EmployeeDataTable() {
   return (
     <DataTable<Employee, Employee, EmployeeFilters>
@@ -196,17 +174,7 @@ export function EmployeeDataTable() {
           <IconPlus data-icon="inline-end" />
         </Button>
       }
-      bulkActions={({ selectedRows }) => (
-        <Button variant="ghost" size="sm" onClick={() => exportEmployees(selectedRows)}>
-          <IconDownload data-icon="inline-start" />
-          Exporter
-        </Button>
-      )}
-      export={{
-        enabled: true,
-        handler: ({ selectedRows, visibleRows }) =>
-          exportEmployees(selectedRows.length > 0 ? selectedRows : visibleRows),
-      }}
+      export={{ enabled: true, filename: "employes" }}
       ariaLabel="Liste des employés"
     />
   )

@@ -1,20 +1,20 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import {
-  IconDownload,
-  IconEdit,
-  IconPlus,
-  IconTrash,
-} from "@tabler/icons-react"
+import { IconPlus } from "@tabler/icons-react"
 
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { TableActionsCell } from "@/components/shared/core-table/cells/actions.cell"
 import { BadgeCell } from "@/components/shared/core-table/cells/badge.cell"
 import { CustomCell } from "@/components/shared/core-table/cells/custom.cell"
 import { NumberCell } from "@/components/shared/core-table/cells/number.cell"
 import { RelationCell } from "@/components/shared/core-table/cells/relation.cell"
 import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
+import {
+  DeleteConfirmationModal,
+  type DeleteConfirmationLevel,
+} from "@/components/shared/delete-confirmation.modal"
 import type {
   DataTableColumn,
   DataTableFilter,
@@ -22,23 +22,11 @@ import type {
 } from "@/components/shared/core-table/table.types"
 import type {
   ResourceDataHooks,
-  ResourceMutation,
 } from "@/app/(board)/board/configuration/_components/resource-data.types"
 import { ResourceForm } from "@/app/(board)/board/configuration/_components/resource.form"
 import { GlobalModal } from "@/components/shared/global.modal"
 import { configurationUi } from "@/config/configuration-ui"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Spinner } from "@/components/ui/spinner"
 import { useCountryListQuery } from "@/hooks/queries/use-country.query"
 import { useModuleListQuery } from "@/hooks/queries/use-module.query"
 import { usePermissionListQuery } from "@/hooks/queries/use-permission.query"
@@ -63,6 +51,21 @@ function identifier(
   return ["countries", "regions", "towns"].includes(resource)
     ? (entity as { slug: string }).slug
     : (entity as { id: string }).id
+}
+
+function singleDeleteLevel(
+  resource: ConfigurationResource
+): DeleteConfirmationLevel {
+  if (resource === "roles") return "match"
+  if (
+    resource === "modules" ||
+    resource === "permissions" ||
+    resource === "group-modules" ||
+    resource === "group-permissions"
+  ) {
+    return "confirm"
+  }
+  return "simple"
 }
 
 function columnsFor(
@@ -131,6 +134,7 @@ function columnsFor(
         id: "country",
         label: "Pays",
         header: "Pays",
+        exportValue: (row) => (row as Region).country?.name ?? "",
         cell: ({ row }) => (
           <RelationCell value={(row.original as Region).country?.name} />
         ),
@@ -145,6 +149,7 @@ function columnsFor(
         id: "region",
         label: "Région",
         header: "Région",
+        exportValue: (row) => (row as Town).region?.name ?? "",
         cell: ({ row }) => (
           <RelationCell value={(row.original as Town).region?.name} />
         ),
@@ -153,6 +158,7 @@ function columnsFor(
         id: "country",
         label: "Pays",
         header: "Pays",
+        exportValue: (row) => (row as Town).region?.country?.name ?? "",
         cell: ({ row }) => (
           <RelationCell value={(row.original as Town).region?.country?.name} />
         ),
@@ -167,6 +173,8 @@ function columnsFor(
         id: "users",
         label: "Utilisateurs",
         header: "Utilisateurs",
+        exportValue: (row) =>
+          String((row as Role)._count?.users ?? 0),
         cell: ({ row }) => (
           <NumberCell value={(row.original as Role)._count?.users ?? 0} />
         ),
@@ -175,6 +183,8 @@ function columnsFor(
         id: "permissions",
         label: "Droits",
         header: "Droits",
+        exportValue: (row) =>
+          String((row as Role).permissionsPerModule?.length ?? 0),
         cell: ({ row }) => (
           <BadgeCell
             value={(row.original as Role).permissionsPerModule?.length ?? 0}
@@ -200,150 +210,6 @@ function columnsFor(
     },
     updatedAt,
   ]
-}
-
-function RowActions({
-  entity,
-  onEdit,
-  onDelete,
-}: {
-  entity: ConfigurationEntity
-  onEdit: (entity: ConfigurationEntity) => void
-  onDelete: (entity: ConfigurationEntity) => void
-}) {
-  return (
-    <div className="flex items-center justify-end gap-0.5">
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        aria-label={`Modifier ${entity.name}`}
-        onClick={() => onEdit(entity)}
-      >
-        <IconEdit />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        className="text-destructive hover:text-destructive"
-        aria-label={`Supprimer ${entity.name}`}
-        onClick={() => onDelete(entity)}
-      >
-        <IconTrash />
-      </Button>
-    </div>
-  )
-}
-
-function exportRows(
-  rows: ConfigurationEntity[],
-  resource: ConfigurationResource
-) {
-  if (rows.length === 0) return
-  const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))].filter(
-    (key) => !["permissionsPerModule", "_count"].includes(key)
-  )
-  const serialize = (value: unknown) => {
-    if (typeof value === "object" && value !== null) {
-      if ("name" in value) return String(value.name)
-      return JSON.stringify(value)
-    }
-    return String(value ?? "")
-  }
-  const content = [
-    keys.join(","),
-    ...rows.map((row) =>
-      keys
-        .map(
-          (key) =>
-            `"${serialize((row as unknown as Record<string, unknown>)[key]).replaceAll('"', '""')}"`
-        )
-        .join(",")
-    ),
-  ].join("\n")
-  const url = URL.createObjectURL(
-    new Blob([`\uFEFF${content}`], { type: "text/csv;charset=utf-8" })
-  )
-  const link = document.createElement("a")
-  link.href = url
-  link.download = `${resource}.csv`
-  link.click()
-  URL.revokeObjectURL(url)
-}
-
-function BulkActions({
-  resource,
-  rows,
-  clearSelection,
-  mutation,
-}: {
-  resource: ConfigurationResource
-  rows: ConfigurationEntity[]
-  clearSelection: () => void
-  mutation: ResourceMutation<string[]>
-}) {
-  const [open, setOpen] = useState(false)
-
-  async function removeSelected() {
-    try {
-      await mutation.mutateAsync(rows.map((row) => identifier(resource, row)))
-      clearSelection()
-      setOpen(false)
-    } catch {
-      // The mutation error remains visible in the confirmation dialog.
-    }
-  }
-
-  return (
-    <>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => exportRows(rows, resource)}
-      >
-        <IconDownload />
-        Exporter
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="text-destructive hover:text-destructive"
-        onClick={() => {
-          mutation.reset()
-          setOpen(true)
-        }}
-      >
-        <IconTrash />
-        Supprimer
-      </Button>
-      <AlertDialog
-        open={open}
-        onOpenChange={(next) => {
-          if (!mutation.isPending) setOpen(next)
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la sélection ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {`${rows.length} élément${rows.length > 1 ? "s" : ""} seront supprimés définitivement.`}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={mutation.isPending}>
-              Annuler
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              disabled={mutation.isPending}
-              onClick={() => void removeSelected()}
-            >
-              {mutation.isPending ? <Spinner /> : null}Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  )
 }
 
 export function ResourceDataTable({
@@ -475,31 +341,26 @@ export function ResourceDataTable({
           </Button>
         }
         rowActions={(entity) => (
-          <RowActions
-            entity={entity}
-            onEdit={(current) => setFormState({ open: true, entity: current })}
-            onDelete={(current) => {
+          <TableActionsCell
+            label={entity.name}
+            onEdit={() => setFormState({ open: true, entity })}
+            onDelete={() => {
               deleteMutation.reset()
-              setDeleting(current)
+              setDeleting(entity)
             }}
           />
         )}
-        bulkActions={({ selectedRows, clearSelection }) => (
-          <BulkActions
-            resource={resource}
-            rows={selectedRows}
-            clearSelection={clearSelection}
-            mutation={bulkDeleteMutation}
-          />
-        )}
-        export={{
-          enabled: true,
-          handler: ({ selectedRows, visibleRows }) =>
-            exportRows(
-              selectedRows.length > 0 ? selectedRows : visibleRows,
-              resource
-            ),
+        bulkDelete={{
+          level: "confirm",
+          isPending: bulkDeleteMutation.isPending,
+          onReset: () => bulkDeleteMutation.reset(),
+          onDelete: async (rows) => {
+            await bulkDeleteMutation.mutateAsync(
+              rows.map((row) => identifier(resource, row))
+            )
+          },
         }}
+        export={{ enabled: true, filename: resource }}
         ariaLabel={`Liste des ${ui.title.toLocaleLowerCase("fr")}`}
       />
       <GlobalModal
@@ -539,7 +400,7 @@ export function ResourceDataTable({
           }
         />
       </GlobalModal>
-      <AlertDialog
+      <DeleteConfirmationModal
         open={Boolean(deleting)}
         onOpenChange={(open) => {
           if (!open && !deleteMutation.isPending) {
@@ -547,28 +408,12 @@ export function ResourceDataTable({
             deleteMutation.reset()
           }
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer {ui.singular} ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {`« ${deleting?.name ?? ""} » sera supprimé définitivement.`}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutation.isPending}>
-              Annuler
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              disabled={deleteMutation.isPending}
-              onClick={() => void confirmDelete()}
-            >
-              {deleteMutation.isPending ? <Spinner /> : null}Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        level={singleDeleteLevel(resource)}
+        itemName={deleting?.name}
+        matchValue={resource === "roles" ? deleting?.name : undefined}
+        onConfirm={confirmDelete}
+        isPending={deleteMutation.isPending}
+      />
     </>
   )
 }

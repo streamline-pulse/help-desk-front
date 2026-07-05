@@ -22,6 +22,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 function filterDisplayValue<TFilters>(
   filter: DataTableFilter<TFilters>,
@@ -129,37 +130,47 @@ export function DataTableToolbar<TRow, TFilters>({
 }: {
   exportEnabled: boolean
 }) {
-  const { state, searchConfig, toolbarActions } =
+  const { state, searchConfig, toolbarActions, selectedRows } =
     useDataTableContext<TRow, TFilters>()
   const searchEnabled = searchConfig?.enabled !== false
+  const hasSelection = selectedRows.length > 0
+
   return (
-    <div className="flex flex-col gap-3 px-6 pb-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-          {searchEnabled ? (
-            <InputGroup className="w-full sm:w-72 sm:shrink-0">
-              <InputGroupAddon>
-                <IconSearch aria-hidden="true" />
-              </InputGroupAddon>
-              <InputGroupInput
-                type="search"
-                value={state.search}
-                onChange={(event) => state.setSearch(event.target.value)}
-                placeholder={searchConfig?.placeholder ?? "Rechercher…"}
-                aria-label={searchConfig?.placeholder ?? "Rechercher"}
-              />
-            </InputGroup>
-          ) : null}
-          <ActiveFilters<TRow, TFilters> />
+    <div className="px-6 pb-3">
+      <div className="relative">
+        <div
+          className={cn(
+            "flex flex-wrap items-center justify-between gap-3 transition-opacity duration-200",
+            hasSelection && "invisible"
+          )}
+          aria-hidden={hasSelection}
+        >
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+            {searchEnabled ? (
+              <InputGroup className="w-full sm:w-72 sm:shrink-0">
+                <InputGroupAddon>
+                  <IconSearch aria-hidden="true" />
+                </InputGroupAddon>
+                <InputGroupInput
+                  type="search"
+                  value={state.search}
+                  onChange={(event) => state.setSearch(event.target.value)}
+                  placeholder={searchConfig?.placeholder ?? "Rechercher…"}
+                  aria-label={searchConfig?.placeholder ?? "Rechercher"}
+                />
+              </InputGroup>
+            ) : null}
+            <ActiveFilters<TRow, TFilters> />
+          </div>
+          <div className="flex shrink-0 items-center gap-0.5">
+            <FiltersPopover<TRow, TFilters> />
+            <DataTableColumnVisibility<TRow, TFilters> />
+            {exportEnabled ? <DataTableExport<TRow, TFilters> /> : null}
+            {toolbarActions}
+          </div>
         </div>
-        <div className="flex shrink-0 items-center gap-0.5">
-          <FiltersPopover<TRow, TFilters> />
-          <DataTableColumnVisibility<TRow, TFilters> />
-          {exportEnabled ? <DataTableExport<TRow, TFilters> /> : null}
-          {toolbarActions}
-        </div>
+        <DataTableSelectionActions<TRow, TFilters> exportEnabled={exportEnabled} />
       </div>
-      <DataTableSelectionActions<TRow, TFilters> />
     </div>
   )
 }

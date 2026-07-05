@@ -2,36 +2,30 @@
 
 import { useMemo, useState } from "react"
 import {
-  IconDownload,
-  IconEdit,
+  IconClock,
+  IconMail,
+  IconMailCheck,
   IconPlus,
-  IconTrash,
+  IconShield,
+  IconToggleRight,
 } from "@tabler/icons-react"
 
 import { UserForm } from "@/app/(board)/board/utilisateurs/_components/user.form"
+import { DeleteConfirmationModal } from "@/components/shared/delete-confirmation.modal"
 import { GlobalModal } from "@/components/shared/global.modal"
+import { TableActionsCell } from "@/components/shared/core-table/cells/actions.cell"
 import { BooleanCell } from "@/components/shared/core-table/cells/boolean.cell"
 import { BadgeCell } from "@/components/shared/core-table/cells/badge.cell"
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
 import { LinkCell } from "@/components/shared/core-table/cells/link.cell"
 import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
+import { TableColumnHeader } from "@/components/shared/core-table/table.column-header"
 import type {
   DataTableColumn,
   DataTableRequest,
 } from "@/components/shared/core-table/table.types"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Spinner } from "@/components/ui/spinner"
 import {
   useBulkDeleteUsersMutation,
   useCreateUserMutation,
@@ -44,34 +38,6 @@ import type { PageResult } from "@/types/api/api-data.type"
 import type { User } from "@/types/api/user.type"
 
 type Filters = Record<string, never>
-
-function exportUsers(rows: User[]) {
-  if (!rows.length) return
-  const content = [
-    "Prénom,Nom,E-mail,Téléphone,Rôle,Actif,Super administrateur",
-    ...rows.map((user) =>
-      [
-        user.firstName,
-        user.lastName,
-        user.email ?? "",
-        `${user.indicatif ?? ""}${user.phone ?? ""}`,
-        user.role?.name ?? "",
-        user.active ? "Oui" : "Non",
-        user.isSuperAdmin ? "Oui" : "Non",
-      ]
-        .map((value) => `"${String(value).replaceAll('"', '""')}"`)
-        .join(",")
-    ),
-  ].join("\n")
-  const url = URL.createObjectURL(
-    new Blob([`\uFEFF${content}`], { type: "text/csv;charset=utf-8" })
-  )
-  const link = document.createElement("a")
-  link.href = url
-  link.download = "utilisateurs.csv"
-  link.click()
-  URL.revokeObjectURL(url)
-}
 
 export function UserTable() {
   const [editing, setEditing] = useState<User | null>(null)
@@ -88,7 +54,8 @@ export function UserTable() {
       {
         id: "name",
         label: "Nom",
-        header: "Nom",
+        header: () => <TableColumnHeader>Nom</TableColumnHeader>,
+        exportValue: (user) => `${user.firstName} ${user.lastName}`.trim(),
         cell: ({ row }) => (
           <TextCell
             value={`${row.original.firstName} ${row.original.lastName}`.trim()}
@@ -99,7 +66,9 @@ export function UserTable() {
       {
         accessorKey: "email",
         label: "E-mail",
-        header: "E-mail",
+        header: () => (
+          <TableColumnHeader icon={IconMail}>E-mail</TableColumnHeader>
+        ),
         cell: ({ row }) => (
           <LinkCell
             href={row.original.email ? `mailto:${row.original.email}` : null}
@@ -111,7 +80,10 @@ export function UserTable() {
       {
         id: "role",
         label: "Rôle",
-        header: "Rôle",
+        header: () => (
+          <TableColumnHeader icon={IconShield}>Rôle</TableColumnHeader>
+        ),
+        exportValue: (user) => user.role?.name ?? "",
         cell: ({ row }) => (
           <BadgeCell
             value={row.original.role?.name}
@@ -123,7 +95,10 @@ export function UserTable() {
       {
         id: "status",
         label: "Statut",
-        header: "Statut",
+        header: () => (
+          <TableColumnHeader icon={IconToggleRight}>Statut</TableColumnHeader>
+        ),
+        exportValue: (user) => (user.active ? "Actif" : "Inactif"),
         cell: ({ row }) => (
           <BooleanCell value={row.original.active} preset="active" />
         ),
@@ -131,7 +106,11 @@ export function UserTable() {
       {
         id: "verification",
         label: "Vérification",
-        header: "Vérification",
+        header: () => (
+          <TableColumnHeader icon={IconMailCheck}>Vérification</TableColumnHeader>
+        ),
+        exportValue: (user) =>
+          user.emailVerified ? "E-mail vérifié" : "En attente",
         cell: ({ row }) => (
           <BooleanCell value={row.original.emailVerified} preset="verified" />
         ),
@@ -139,7 +118,9 @@ export function UserTable() {
       {
         accessorKey: "updatedAt",
         label: "Modification",
-        header: "Modification",
+        header: () => (
+          <TableColumnHeader icon={IconClock}>Modification</TableColumnHeader>
+        ),
         cell: ({ row }) => (
           <DateCell value={row.original.updatedAt} relativeUntilDays={3} />
         ),
@@ -192,62 +173,27 @@ export function UserTable() {
           </Button>
         }
         rowActions={(user) => (
-          <div className="flex justify-end gap-0.5">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Modifier ${user.firstName} ${user.lastName}`}
-              onClick={() => {
-                setEditing(user)
-                setFormOpen(true)
-              }}
-            >
-              <IconEdit />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="text-destructive hover:text-destructive"
-              aria-label={`Supprimer ${user.firstName} ${user.lastName}`}
-              onClick={() => {
-                deleteMutation.reset()
-                setDeleting(user)
-              }}
-            >
-              <IconTrash />
-            </Button>
-          </div>
+          <TableActionsCell
+            label={`${user.firstName} ${user.lastName}`.trim()}
+            onEdit={() => {
+              setEditing(user)
+              setFormOpen(true)
+            }}
+            onDelete={() => {
+              deleteMutation.reset()
+              setDeleting(user)
+            }}
+          />
         )}
-        bulkActions={({ selectedRows, clearSelection }) => (
-          <>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => exportUsers(selectedRows)}
-            >
-              <IconDownload />
-              Exporter
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-destructive hover:text-destructive"
-              onClick={() =>
-                void bulkDeleteMutation
-                  .mutateAsync(selectedRows.map((user) => user.id))
-                  .then(clearSelection)
-              }
-            >
-              <IconTrash />
-              Supprimer
-            </Button>
-          </>
-        )}
-        export={{
-          enabled: true,
-          handler: ({ selectedRows, visibleRows }) =>
-            exportUsers(selectedRows.length ? selectedRows : visibleRows),
+        bulkDelete={{
+          level: "confirm",
+          isPending: bulkDeleteMutation.isPending,
+          onReset: () => bulkDeleteMutation.reset(),
+          onDelete: async (rows) => {
+            await bulkDeleteMutation.mutateAsync(rows.map((user) => user.id))
+          },
         }}
+        export={{ enabled: true, filename: "utilisateurs" }}
         ariaLabel="Liste des utilisateurs"
       />
       <GlobalModal
@@ -275,34 +221,21 @@ export function UserTable() {
           }}
         />
       </GlobalModal>
-      <AlertDialog
+      <DeleteConfirmationModal
         open={Boolean(deleting)}
         onOpenChange={(open) => {
           if (!open && !deleteMutation.isPending) setDeleting(null)
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer cet utilisateur ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Le compte de {deleting?.firstName} {deleting?.lastName} sera
-              supprimé définitivement.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutation.isPending}>
-              Annuler
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              disabled={deleteMutation.isPending}
-              onClick={() => void confirmDelete()}
-            >
-              {deleteMutation.isPending ? <Spinner /> : null}Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        level="match"
+        itemName={
+          deleting
+            ? `${deleting.firstName} ${deleting.lastName}`.trim()
+            : undefined
+        }
+        matchValue={deleting?.email ?? undefined}
+        onConfirm={confirmDelete}
+        isPending={deleteMutation.isPending}
+      />
     </>
   )
 }

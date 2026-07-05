@@ -15,6 +15,7 @@ import {
 
 import type {
   DataTableBulkActions,
+  DataTableBulkDeleteConfig,
   DataTableColumn,
   DataTableController,
   DataTableExportConfig,
@@ -24,6 +25,7 @@ import type {
   DataTableState,
   NormalizedApiError,
 } from "@/components/shared/core-table/table.types"
+import { exportTableToCsv } from "@/components/shared/core-table/table.export.utils"
 import { Checkbox } from "@/components/ui/checkbox"
 
 type UseDataTableOptions<TRow, TFilters> = {
@@ -41,6 +43,7 @@ type UseDataTableOptions<TRow, TFilters> = {
   pageSizeOptions: readonly number[]
   toolbarActions?: React.ReactNode
   bulkActions?: DataTableBulkActions<TRow>
+  bulkDeleteConfig?: DataTableBulkDeleteConfig<TRow>
   exportConfig?: DataTableExportConfig<TRow, TFilters>
   beforeTable?: React.ReactNode
   slots?: DataTableSlots
@@ -142,6 +145,7 @@ export function useDataTable<TRow, TFilters>({
   pageSizeOptions,
   toolbarActions,
   bulkActions,
+  bulkDeleteConfig,
   exportConfig,
   beforeTable,
   slots,
@@ -185,6 +189,7 @@ export function useDataTable<TRow, TFilters>({
         className: column.className,
         headerClassName: column.headerClassName,
         exportable: column.exportable,
+        exportValue: column.exportValue,
       },
     }))
 
@@ -264,12 +269,28 @@ export function useDataTable<TRow, TFilters>({
     if (!exportConfig?.enabled || isExporting) return
     setIsExporting(true)
     try {
-      await exportConfig.handler({
-        request: state.request,
-        visibleRows: table.getRowModel().rows.map((row) => row.original),
-        selectedRows,
-        clearSelection,
-      })
+      const rows =
+        selectedRows.length > 0
+          ? selectedRows
+          : table.getRowModel().rows.map((row) => row.original)
+
+      if (exportConfig.handler) {
+        await exportConfig.handler({
+          request: state.request,
+          visibleRows: table.getRowModel().rows.map((row) => row.original),
+          selectedRows,
+          clearSelection,
+        })
+        return
+      }
+
+      if (exportConfig.filename) {
+        exportTableToCsv({
+          table,
+          rows,
+          filename: exportConfig.filename,
+        })
+      }
     } finally {
       setIsExporting(false)
     }
@@ -297,6 +318,7 @@ export function useDataTable<TRow, TFilters>({
     pageSizeOptions,
     toolbarActions,
     bulkActions,
+    bulkDeleteConfig,
     beforeTable,
     slots,
     ariaLabel,

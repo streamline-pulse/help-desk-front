@@ -44,12 +44,29 @@ export function DataTableHeader<TRow, TFilters>() {
                 {header.isPlaceholder ? null : header.column.getCanSort() ? (
                   <button
                     type="button"
-                    className="flex h-full w-full items-center gap-1.5 text-left text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex h-full w-full items-center gap-1 text-left text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     onClick={header.column.getToggleSortingHandler()}
                   >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                    {sorted === "asc" ? <IconChevronUp aria-hidden="true" /> : null}
-                    {sorted === "desc" ? <IconChevronDown aria-hidden="true" /> : null}
+                    <span className="min-w-0 flex-1 truncate">
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </span>
+                    {sorted === "asc" ? (
+                      <IconChevronUp
+                        className="size-3 shrink-0 text-muted-foreground"
+                        stroke={2}
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    {sorted === "desc" ? (
+                      <IconChevronDown
+                        className="size-3 shrink-0 text-muted-foreground"
+                        stroke={2}
+                        aria-hidden="true"
+                      />
+                    ) : null}
                   </button>
                 ) : (
                   flexRender(header.column.columnDef.header, header.getContext())
