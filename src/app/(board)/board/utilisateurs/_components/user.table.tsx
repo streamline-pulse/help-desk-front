@@ -10,7 +10,11 @@ import {
 
 import { UserForm } from "@/app/(board)/board/utilisateurs/_components/user.form"
 import { GlobalModal } from "@/components/shared/global.modal"
+import { BooleanCell } from "@/components/shared/core-table/cells/boolean.cell"
+import { BadgeCell } from "@/components/shared/core-table/cells/badge.cell"
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { LinkCell } from "@/components/shared/core-table/cells/link.cell"
+import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
 import type {
   DataTableColumn,
@@ -26,7 +30,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import {
@@ -83,18 +86,26 @@ export function UserTable() {
   const columns = useMemo<DataTableColumn<User>[]>(
     () => [
       {
-        id: "identity",
-        label: "Utilisateur",
-        header: "Utilisateur",
+        id: "name",
+        label: "Nom",
+        header: "Nom",
         cell: ({ row }) => (
-          <div>
-            <div className="font-medium">
-              {row.original.firstName} {row.original.lastName}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {row.original.email ?? "Sans e-mail"}
-            </div>
-          </div>
+          <TextCell
+            value={`${row.original.firstName} ${row.original.lastName}`.trim()}
+            variant="primary"
+          />
+        ),
+      },
+      {
+        accessorKey: "email",
+        label: "E-mail",
+        header: "E-mail",
+        cell: ({ row }) => (
+          <LinkCell
+            href={row.original.email ? `mailto:${row.original.email}` : null}
+            value={row.original.email}
+            fallback="Sans e-mail"
+          />
         ),
       },
       {
@@ -102,9 +113,11 @@ export function UserTable() {
         label: "Rôle",
         header: "Rôle",
         cell: ({ row }) => (
-          <Badge variant="outline">
-            {row.original.role?.name ?? "Non attribué"}
-          </Badge>
+          <BadgeCell
+            value={row.original.role?.name}
+            variant="outline"
+            fallback="Non attribué"
+          />
         ),
       },
       {
@@ -112,17 +125,16 @@ export function UserTable() {
         label: "Statut",
         header: "Statut",
         cell: ({ row }) => (
-          <Badge variant={row.original.active ? "secondary" : "outline"}>
-            {row.original.active ? "Actif" : "Inactif"}
-          </Badge>
+          <BooleanCell value={row.original.active} preset="active" />
         ),
       },
       {
         id: "verification",
         label: "Vérification",
         header: "Vérification",
-        cell: ({ row }) =>
-          row.original.emailVerified ? "E-mail vérifié" : "En attente",
+        cell: ({ row }) => (
+          <BooleanCell value={row.original.emailVerified} preset="verified" />
+        ),
       },
       {
         accessorKey: "updatedAt",

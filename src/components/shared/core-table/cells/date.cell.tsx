@@ -10,6 +10,11 @@ import {
 import { fr } from "date-fns/locale"
 
 import {
+  CellShell,
+  CellTruncate,
+  EMPTY_FALLBACK,
+} from "@/components/shared/core-table/cells/cell.utils"
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -28,7 +33,7 @@ function parseDate(value?: string | number | Date | null) {
 export function DateCell({
   value,
   formatPattern = "dd/MM/yyyy HH:mm",
-  fallback = "—",
+  fallback = EMPTY_FALLBACK,
   relativeUntilDays = 0,
 }: {
   value?: string | number | Date | null
@@ -38,7 +43,13 @@ export function DateCell({
 }) {
   const date = parseDate(value)
   if (!date || !isValid(date)) {
-    return <span className="tabular-nums">{fallback}</span>
+    return (
+      <CellShell>
+        <CellTruncate className="text-sm tabular-nums text-muted-foreground">
+          {fallback}
+        </CellTruncate>
+      </CellShell>
+    )
   }
 
   const exactDate = format(date, formatPattern, { locale: fr })
@@ -49,9 +60,14 @@ export function DateCell({
 
   if (!isRecent) {
     return (
-      <time className="tabular-nums" dateTime={date.toISOString()}>
-        {exactDate}
-      </time>
+      <CellShell title={exactDate}>
+        <time
+          className="block truncate text-sm tabular-nums text-foreground"
+          dateTime={date.toISOString()}
+        >
+          {exactDate}
+        </time>
+      </CellShell>
     )
   }
 
@@ -61,20 +77,22 @@ export function DateCell({
   })
 
   return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <time
-            className="tabular-nums text-muted-foreground"
-            dateTime={date.toISOString()}
-            tabIndex={0}
-            suppressHydrationWarning
-          />
-        }
-      >
-        {relativeDate}
-      </TooltipTrigger>
-      <TooltipContent side="bottom">{exactDate}</TooltipContent>
-    </Tooltip>
+    <CellShell title={exactDate}>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <time
+              className="block truncate text-sm tabular-nums text-muted-foreground"
+              dateTime={date.toISOString()}
+              tabIndex={0}
+              suppressHydrationWarning
+            />
+          }
+        >
+          {relativeDate}
+        </TooltipTrigger>
+        <TooltipContent side="bottom">{exactDate}</TooltipContent>
+      </Tooltip>
+    </CellShell>
   )
 }

@@ -9,6 +9,11 @@ import {
 } from "@tabler/icons-react"
 
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { BadgeCell } from "@/components/shared/core-table/cells/badge.cell"
+import { CustomCell } from "@/components/shared/core-table/cells/custom.cell"
+import { NumberCell } from "@/components/shared/core-table/cells/number.cell"
+import { RelationCell } from "@/components/shared/core-table/cells/relation.cell"
+import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
 import type {
   DataTableColumn,
@@ -32,7 +37,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { useCountryListQuery } from "@/hooks/queries/use-country.query"
@@ -68,7 +72,7 @@ function columnsFor(
     accessorKey: "name",
     label: "Nom",
     header: "Nom",
-    cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+    cell: ({ row }) => <TextCell value={row.original.name} variant="primary" />,
   }
   const updatedAt: DataTableColumn<ConfigurationEntity> = {
     accessorKey: "updatedAt",
@@ -87,9 +91,10 @@ function columnsFor(
         label: "Code",
         header: "Code",
         cell: ({ row }) => (
-          <Badge variant="outline">
-            {(row.original as { language: string }).language}
-          </Badge>
+          <CustomCell
+            variant="code"
+            value={(row.original as { language: string }).language}
+          />
         ),
       },
       updatedAt,
@@ -107,14 +112,14 @@ function columnsFor(
         label: "Libellé",
         header: "Libellé",
         cell: ({ row }) => (
-          <span className="font-medium">{(row.original as Module).label}</span>
+          <TextCell value={(row.original as Module).label} variant="primary" />
         ),
       },
       {
         accessorKey: "name",
         label: "Code",
         header: "Code",
-        cell: ({ row }) => <Badge variant="outline">{row.original.name}</Badge>,
+        cell: ({ row }) => <CustomCell variant="code" value={row.original.name} />,
       },
       updatedAt,
     ]
@@ -126,7 +131,9 @@ function columnsFor(
         id: "country",
         label: "Pays",
         header: "Pays",
-        cell: ({ row }) => (row.original as Region).country?.name ?? "—",
+        cell: ({ row }) => (
+          <RelationCell value={(row.original as Region).country?.name} />
+        ),
       },
       updatedAt,
     ]
@@ -138,13 +145,17 @@ function columnsFor(
         id: "region",
         label: "Région",
         header: "Région",
-        cell: ({ row }) => (row.original as Town).region?.name ?? "—",
+        cell: ({ row }) => (
+          <RelationCell value={(row.original as Town).region?.name} />
+        ),
       },
       {
         id: "country",
         label: "Pays",
         header: "Pays",
-        cell: ({ row }) => (row.original as Town).region?.country?.name ?? "—",
+        cell: ({ row }) => (
+          <RelationCell value={(row.original as Town).region?.country?.name} />
+        ),
       },
       updatedAt,
     ]
@@ -157,9 +168,7 @@ function columnsFor(
         label: "Utilisateurs",
         header: "Utilisateurs",
         cell: ({ row }) => (
-          <span className="tabular-nums">
-            {(row.original as Role)._count?.users ?? 0}
-          </span>
+          <NumberCell value={(row.original as Role)._count?.users ?? 0} />
         ),
       },
       {
@@ -167,9 +176,10 @@ function columnsFor(
         label: "Droits",
         header: "Droits",
         cell: ({ row }) => (
-          <Badge variant="secondary">
-            {(row.original as Role).permissionsPerModule?.length ?? 0}
-          </Badge>
+          <BadgeCell
+            value={(row.original as Role).permissionsPerModule?.length ?? 0}
+            variant="secondary"
+          />
         ),
       },
       updatedAt,
@@ -182,9 +192,10 @@ function columnsFor(
       label: "Identifiant",
       header: "Identifiant",
       cell: ({ row }) => (
-        <span className="text-muted-foreground">
-          {(row.original as { slug: string }).slug}
-        </span>
+        <TextCell
+          value={(row.original as { slug: string }).slug}
+          variant="mono"
+        />
       ),
     },
     updatedAt,

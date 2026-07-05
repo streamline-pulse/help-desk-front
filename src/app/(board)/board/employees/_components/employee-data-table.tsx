@@ -23,6 +23,9 @@ import {
 import { EmploymentStatusBadge } from "@/app/(board)/board/employees/_components/employment-status-badge"
 import { departments } from "@/app/(board)/board/employees/_components/table.constants"
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { LinkCell } from "@/components/shared/core-table/cells/link.cell"
+import { NumberCell } from "@/components/shared/core-table/cells/number.cell"
+import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
 import type {
   DataTableColumn,
@@ -61,6 +64,7 @@ const columns: DataTableColumn<Employee>[] = [
     accessorKey: "id",
     label: "Matricule",
     header: () => <ColumnLabel>Matricule</ColumnLabel>,
+    cell: ({ row }) => <TextCell value={row.original.id} variant="mono" />,
     sortable: true,
   },
   {
@@ -74,6 +78,12 @@ const columns: DataTableColumn<Employee>[] = [
     accessorKey: "email",
     label: "E-mail",
     header: () => <ColumnLabel icon={IconMail}>E-mail</ColumnLabel>,
+    cell: ({ row }) => (
+      <LinkCell
+        href={`mailto:${row.original.email}`}
+        value={row.original.email}
+      />
+    ),
     sortable: true,
   },
   {
@@ -87,19 +97,21 @@ const columns: DataTableColumn<Employee>[] = [
     accessorKey: "years",
     label: "Ancienneté",
     header: () => <ColumnLabel icon={IconClock}>Ancienneté</ColumnLabel>,
-    cell: ({ row }) => <span className="tabular-nums">{row.original.years} ans</span>,
+    cell: ({ row }) => <NumberCell value={row.original.years} suffix="ans" />,
     sortable: true,
   },
   {
     accessorKey: "firstName",
     label: "Prénom",
     header: () => <ColumnLabel icon={IconUser}>Prénom</ColumnLabel>,
+    cell: ({ row }) => <TextCell value={row.original.firstName} />,
     sortable: true,
   },
   {
     accessorKey: "lastName",
     label: "Nom",
     header: () => <ColumnLabel icon={IconUser}>Nom</ColumnLabel>,
+    cell: ({ row }) => <TextCell value={row.original.lastName} />,
     sortable: true,
   },
   {
@@ -113,6 +125,7 @@ const columns: DataTableColumn<Employee>[] = [
     accessorKey: "education",
     label: "Formation",
     header: () => <ColumnLabel icon={IconCertificate}>Formation</ColumnLabel>,
+    cell: ({ row }) => <TextCell value={row.original.education} />,
     sortable: true,
   },
 ]
