@@ -1,8 +1,8 @@
 import { notFound, redirect } from "next/navigation"
 import { IconAdjustments } from "@tabler/icons-react"
 
-import { ConfigurationNav } from "@/components/shared/configuration/configuration-nav"
-import { ResourceTable } from "@/components/shared/configuration/resource-table"
+import { ConfigurationNav } from "@/app/(board)/board/configuration/_components/configuration-nav"
+import { ConfigurationResourceTable } from "@/app/(board)/board/configuration/_components/configuration-resource-table"
 import { PageHeader } from "@/components/shared/page/page.header"
 import {
   configurationMenuResources,
@@ -33,7 +33,7 @@ export default async function ConfigurationResourcePage({
         icon={IconAdjustments}
       />
       <ConfigurationNav />
-      <ResourceTable resource={typedResource} />
+      <ConfigurationResourceTable resource={typedResource} />
     </div>
   )
 }

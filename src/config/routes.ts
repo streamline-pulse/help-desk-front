@@ -15,6 +15,7 @@ export const routes = {
       root: "/board/group-configuration",
       resource: (resource: string) => `/board/group-configuration/${resource}`,
     },
+    users: "/board/utilisateurs",
   },
 
   auth: {
@@ -56,13 +57,6 @@ export const routes = {
     new: "/equipes/nouveau",
     detail: (id: string) => `/equipes/${id}`,
     edit: (id: string) => `/equipes/${id}/modifier`,
-  },
-
-  users: {
-    all: "/utilisateurs",
-    new: "/utilisateurs/nouveau",
-    detail: (id: string) => `/utilisateurs/${id}`,
-    edit: (id: string) => `/utilisateurs/${id}/modifier`,
   },
 
   statistics: {

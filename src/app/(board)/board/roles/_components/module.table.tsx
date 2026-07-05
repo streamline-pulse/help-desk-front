@@ -1,7 +1,7 @@
 "use client"
 
-import { ResourceDataTable } from "@/components/shared/configuration/resource-data-table"
-import type { ResourceDataHooks } from "@/components/shared/configuration/resource-data.types"
+import { ResourceDataTable } from "@/app/(board)/board/configuration/_components/resource-data-table"
+import type { ResourceDataHooks } from "@/app/(board)/board/configuration/_components/resource-data.types"
 import {
   useBulkDeleteModulesMutation,
   useCreateModuleMutation,

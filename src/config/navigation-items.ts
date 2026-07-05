@@ -60,7 +60,7 @@ export const navigationItems = [
   },
   {
     title: "Utilisateurs",
-    url: routes.users.all,
+    url: routes.board.users,
     icon: IconUser,
     moduleCode: moduleCodes.users,
     isReady: true,

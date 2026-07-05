@@ -8,7 +8,8 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 
-import { UserFormDialog } from "@/app/(board)/utilisateurs/_components/user.form.dialog"
+import { UserForm } from "@/app/(board)/board/utilisateurs/_components/user.form"
+import { GlobalModal } from "@/components/shared/global.modal"
 import { DateCell } from "@/components/shared/data-table/cells/date.cell"
 import { DataTable } from "@/components/shared/data-table/data-table"
 import type {
@@ -237,18 +238,31 @@ export function UserTable() {
         }}
         ariaLabel="Liste des utilisateurs"
       />
-      <UserFormDialog
-        key={editing?.id ?? "new"}
-        user={editing}
-        roles={roles}
+      <GlobalModal
         open={formOpen}
         onOpenChange={(open) => {
           setFormOpen(open)
           if (!open) setEditing(null)
         }}
-        createMutation={createMutation}
-        updateMutation={updateMutation}
-      />
+        title={
+          editing ? "Modifier l’utilisateur" : "Ajouter un utilisateur"
+        }
+        description="Renseignez son identité, son rôle et son niveau d’accès."
+        contentClassName="sm:max-w-xl"
+        preventClose={createMutation.isPending || updateMutation.isPending}
+      >
+        <UserForm
+          key={editing?.id ?? "new"}
+          user={editing}
+          roles={roles}
+          createMutation={createMutation}
+          updateMutation={updateMutation}
+          onClose={() => {
+            setFormOpen(false)
+            setEditing(null)
+          }}
+        />
+      </GlobalModal>
       <AlertDialog
         open={Boolean(deleting)}
         onOpenChange={(open) => {

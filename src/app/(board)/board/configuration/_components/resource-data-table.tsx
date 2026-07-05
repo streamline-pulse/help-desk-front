@@ -18,8 +18,10 @@ import type {
 import type {
   ResourceDataHooks,
   ResourceMutation,
-} from "@/components/shared/configuration/resource-data.types"
-import { ResourceFormDialog } from "@/components/shared/configuration/resource-form.dialog"
+} from "@/app/(board)/board/configuration/_components/resource-data.types"
+import { ResourceForm } from "@/app/(board)/board/configuration/_components/resource.form"
+import { GlobalModal } from "@/components/shared/global.modal"
+import { configurationUi } from "@/config/configuration-ui"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +35,6 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { configurationUi } from "@/config/configuration-ui"
 import { useCountryListQuery } from "@/hooks/queries/use-country.query"
 import { useModuleListQuery } from "@/hooks/queries/use-module.query"
 import { usePermissionListQuery } from "@/hooks/queries/use-permission.query"
@@ -490,10 +491,7 @@ export function ResourceDataTable({
         }}
         ariaLabel={`Liste des ${ui.title.toLocaleLowerCase("fr")}`}
       />
-      <ResourceFormDialog
-        key={`${resource}-${formState.entity ? identifier(resource, formState.entity) : "new"}`}
-        resource={resource}
-        entity={formState.entity}
+      <GlobalModal
         open={formState.open}
         onOpenChange={(open) =>
           setFormState((current) => ({
@@ -501,13 +499,35 @@ export function ResourceDataTable({
             entity: open ? current.entity : null,
           }))
         }
-        countries={countries as Country[]}
-        regions={regions as Region[]}
-        modules={modules as Module[]}
-        permissions={permissions as Permission[]}
-        createMutation={createMutation}
-        updateMutation={updateMutation}
-      />
+        title={
+          <>
+            {formState.entity ? "Modifier" : "Ajouter"}{" "}
+            {configurationUi[resource].singular}
+          </>
+        }
+        description={
+          formState.entity
+            ? "Mettez à jour les informations de cette ressource."
+            : "Renseignez les informations de la nouvelle ressource."
+        }
+        contentClassName={resource === "roles" ? "sm:max-w-2xl" : undefined}
+        preventClose={createMutation.isPending || updateMutation.isPending}
+      >
+        <ResourceForm
+          key={`${resource}-${formState.entity ? identifier(resource, formState.entity) : "new"}`}
+          resource={resource}
+          entity={formState.entity}
+          countries={countries as Country[]}
+          regions={regions as Region[]}
+          modules={modules as Module[]}
+          permissions={permissions as Permission[]}
+          createMutation={createMutation}
+          updateMutation={updateMutation}
+          onClose={() =>
+            setFormState({ open: false, entity: null })
+          }
+        />
+      </GlobalModal>
       <AlertDialog
         open={Boolean(deleting)}
         onOpenChange={(open) => {

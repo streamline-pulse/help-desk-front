@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
 import { IconShieldLock } from "@tabler/icons-react"
 
-import { AccessControlNav } from "@/components/shared/configuration/access-control-nav"
-import { ResourceTable } from "@/components/shared/configuration/resource-table"
+import { AccessControlNav } from "@/app/(board)/board/roles/_components/access-control-nav"
+import { AccessControlResourceTable } from "@/app/(board)/board/roles/_components/access-control-resource-table"
 import { PageHeader } from "@/components/shared/page/page.header"
 import {
   accessControlMenuResources,
@@ -34,7 +34,7 @@ export default async function AccessControlResourcePage({
         icon={IconShieldLock}
       />
       <AccessControlNav />
-      <ResourceTable resource={typedResource} />
+      <AccessControlResourceTable resource={typedResource} />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { IconUsers } from "@tabler/icons-react"
 
-import { UserTable } from "@/app/(board)/utilisateurs/_components/user.table"
+import { UserTable } from "@/app/(board)/board/utilisateurs/_components/user.table"
 import { PageHeader } from "@/components/shared/page/page.header"
 
 export default function UsersPage() {

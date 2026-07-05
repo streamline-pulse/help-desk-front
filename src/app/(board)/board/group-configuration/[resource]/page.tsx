@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
 import { IconCategory } from "@tabler/icons-react"
 
-import { GroupConfigurationNav } from "@/components/shared/configuration/group-configuration-nav"
-import { ResourceTable } from "@/components/shared/configuration/resource-table"
+import { GroupConfigurationNav } from "@/app/(board)/board/group-configuration/_components/group-configuration-nav"
+import { GroupConfigurationTable } from "@/app/(board)/board/group-configuration/_components/group-configuration.table"
 import { PageHeader } from "@/components/shared/page/page.header"
 import {
   configurationUi,
@@ -28,7 +28,7 @@ export default async function GroupConfigurationResourcePage({
         icon={IconCategory}
       />
       <GroupConfigurationNav />
-      <ResourceTable resource={typedResource} />
+      <GroupConfigurationTable resource={typedResource} />
     </div>
   )
 }
