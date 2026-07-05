@@ -10,10 +10,15 @@ import {
   IconToggleRight,
 } from "@tabler/icons-react"
 
+import { UserDetailPanel } from "@/app/(board)/board/utilisateurs/_components/user.detail.panel"
 import { UserForm } from "@/app/(board)/board/utilisateurs/_components/user.form"
 import { DeleteConfirmationModal } from "@/components/shared/delete-confirmation.modal"
 import { GlobalModal } from "@/components/shared/global.modal"
-import { TableActionsCell } from "@/components/shared/core-table/cells/actions.cell"
+import { DetailTriggerCell } from "@/components/shared/core-table/cells/detail-trigger.cell"
+import {
+  buildRowActions,
+  TableActionsCell,
+} from "@/components/shared/core-table/cells/actions.cell"
 import { BooleanCell } from "@/components/shared/core-table/cells/boolean.cell"
 import { BadgeCell } from "@/components/shared/core-table/cells/badge.cell"
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
@@ -21,11 +26,13 @@ import { LinkCell } from "@/components/shared/core-table/cells/link.cell"
 import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
 import { TableColumnHeader } from "@/components/shared/core-table/table.column-header"
+import { TableDetailDrawer } from "@/components/shared/core-table/table.detail-drawer"
 import type {
   DataTableColumn,
   DataTableRequest,
 } from "@/components/shared/core-table/table.types"
 import { Button } from "@/components/ui/button"
+import { useTableDetail } from "@/hooks/use-table-detail"
 import {
   useBulkDeleteUsersMutation,
   useCreateUserMutation,
@@ -43,6 +50,7 @@ export function UserTable() {
   const [editing, setEditing] = useState<User | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [deleting, setDeleting] = useState<User | null>(null)
+  const detail = useTableDetail<User>()
   const createMutation = useCreateUserMutation()
   const updateMutation = useUpdateUserMutation()
   const deleteMutation = useDeleteUserMutation()
@@ -56,12 +64,19 @@ export function UserTable() {
         label: "Nom",
         header: () => <TableColumnHeader>Nom</TableColumnHeader>,
         exportValue: (user) => `${user.firstName} ${user.lastName}`.trim(),
-        cell: ({ row }) => (
-          <TextCell
-            value={`${row.original.firstName} ${row.original.lastName}`.trim()}
-            variant="primary"
-          />
-        ),
+        cell: ({ row }) => {
+          const fullName =
+            `${row.original.firstName} ${row.original.lastName}`.trim()
+
+          return (
+            <DetailTriggerCell
+              label={fullName}
+              onClick={() => detail.openDetail(row.original)}
+            >
+              <TextCell value={fullName} variant="primary" />
+            </DetailTriggerCell>
+          )
+        },
       },
       {
         accessorKey: "email",
@@ -126,7 +141,7 @@ export function UserTable() {
         ),
       },
     ],
-    []
+    [detail.openDetail]
   )
   function useUsersQuery(request: DataTableRequest<Filters>) {
     return useUserListQuery(request)
@@ -138,6 +153,24 @@ export function UserTable() {
       setDeleting(null)
     } catch {}
   }
+  const detailName = detail.item
+    ? `${detail.item.firstName} ${detail.item.lastName}`.trim()
+    : ""
+
+  function getUserRowActions(user: User) {
+    return buildRowActions({
+      label: `${user.firstName} ${user.lastName}`.trim(),
+      onEdit: () => {
+        setEditing(user)
+        setFormOpen(true)
+      },
+      onDelete: () => {
+        deleteMutation.reset()
+        setDeleting(user)
+      },
+    })
+  }
+
   return (
     <>
       <DataTable<User, User, Filters, PageResult<User>>
@@ -173,17 +206,7 @@ export function UserTable() {
           </Button>
         }
         rowActions={(user) => (
-          <TableActionsCell
-            label={`${user.firstName} ${user.lastName}`.trim()}
-            onEdit={() => {
-              setEditing(user)
-              setFormOpen(true)
-            }}
-            onDelete={() => {
-              deleteMutation.reset()
-              setDeleting(user)
-            }}
-          />
+          <TableActionsCell actions={getUserRowActions(user)} />
         )}
         bulkDelete={{
           level: "confirm",
@@ -196,6 +219,15 @@ export function UserTable() {
         export={{ enabled: true, filename: "utilisateurs" }}
         ariaLabel="Liste des utilisateurs"
       />
+      <TableDetailDrawer
+        open={detail.open}
+        onOpenChange={detail.onOpenChange}
+        title={detailName || "Utilisateur"}
+        description="Consultez le profil et les accès de cet utilisateur."
+        actions={detail.item ? getUserRowActions(detail.item) : undefined}
+      >
+        {detail.item ? <UserDetailPanel user={detail.item} /> : null}
+      </TableDetailDrawer>
       <GlobalModal
         open={formOpen}
         onOpenChange={(open) => {

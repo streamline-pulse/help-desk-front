@@ -4,8 +4,11 @@ import type { ComponentType } from "react"
 import { IconEdit, IconTrash } from "@tabler/icons-react"
 
 import { CellShell } from "@/components/shared/core-table/cells/cell.utils"
-import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
+import {
+  getIconButtonSizeProps,
+  IconButton,
+} from "@/components/ui/icon-button"
 import { cn } from "@/lib/utils"
 
 export type TableRowAction = {
@@ -17,26 +20,21 @@ export type TableRowAction = {
   hidden?: boolean
 }
 
-type TableActionsCellProps = {
+type BuildRowActionsInput = {
   label?: string
   onEdit?: () => void
   onDelete?: () => void
   editLabel?: string
   deleteLabel?: string
-  actions?: TableRowAction[]
-  className?: string
 }
 
-function buildDefaultActions({
+export function buildRowActions({
   label,
   onEdit,
   onDelete,
   editLabel,
   deleteLabel,
-}: Pick<
-  TableActionsCellProps,
-  "label" | "onEdit" | "onDelete" | "editLabel" | "deleteLabel"
->): TableRowAction[] {
+}: BuildRowActionsInput): TableRowAction[] {
   const actions: TableRowAction[] = []
 
   if (onEdit) {
@@ -61,6 +59,51 @@ function buildDefaultActions({
   return actions
 }
 
+type TableRowActionsButtonsProps = {
+  actions: TableRowAction[]
+  className?: string
+  size?: "sm" | "md"
+}
+
+export function TableRowActionsButtons({
+  actions,
+  className,
+  size = "sm",
+}: TableRowActionsButtonsProps) {
+  const visibleActions = actions.filter((action) => !action.hidden)
+  const sizeProps = getIconButtonSizeProps(size)
+
+  if (visibleActions.length === 0) return null
+
+  return (
+    <ButtonGroup className={className}>
+      {visibleActions.map((action) => (
+        <IconButton
+          key={action.id}
+          type="button"
+          variant="outline"
+          tooltip={action.label}
+          tooltipSide="top"
+          {...sizeProps}
+          className={cn(
+            action.destructive &&
+              "text-destructive hover:bg-destructive/10 hover:text-destructive"
+          )}
+          onClick={action.onClick}
+          data-table-interactive="true"
+        >
+          <action.icon className="size-3.5" stroke={1.75} aria-hidden="true" />
+        </IconButton>
+      ))}
+    </ButtonGroup>
+  )
+}
+
+type TableActionsCellProps = BuildRowActionsInput & {
+  actions?: TableRowAction[]
+  className?: string
+}
+
 export function TableActionsCell({
   label,
   onEdit,
@@ -71,32 +114,17 @@ export function TableActionsCell({
   className,
 }: TableActionsCellProps) {
   const visibleActions = [
-    ...buildDefaultActions({ label, onEdit, onDelete, editLabel, deleteLabel }),
+    ...buildRowActions({ label, onEdit, onDelete, editLabel, deleteLabel }),
     ...actions,
-  ].filter((action) => !action.hidden)
+  ]
 
-  if (visibleActions.length === 0) return null
+  if (visibleActions.filter((action) => !action.hidden).length === 0) {
+    return null
+  }
 
   return (
     <CellShell className={cn("flex justify-end", className)}>
-      <ButtonGroup>
-        {visibleActions.map((action) => (
-          <Button
-            key={action.id}
-            type="button"
-            variant="outline"
-            size="icon-sm"
-            aria-label={action.label}
-            className={cn(
-              action.destructive &&
-                "text-destructive hover:bg-destructive/10 hover:text-destructive"
-            )}
-            onClick={action.onClick}
-          >
-            <action.icon className="size-3.5" stroke={1.75} aria-hidden="true" />
-          </Button>
-        ))}
-      </ButtonGroup>
+      <TableRowActionsButtons actions={visibleActions} />
     </CellShell>
   )
 }

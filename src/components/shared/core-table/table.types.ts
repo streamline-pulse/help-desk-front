@@ -43,7 +43,6 @@ export type DataTableColumnMeta = {
   headerClassName?: string
   hideable?: boolean
   exportable?: boolean
-  exportValue?: (row: unknown) => string
 }
 
 export type DataTableColumn<TRow, TValue = unknown> = ColumnDef<TRow, TValue> &
@@ -147,6 +146,11 @@ export type DataTableBulkActions<TRow> = (context: {
   clearSelection: () => void
 }) => ReactNode
 
+export type DataTableRowInteraction<TRow> = {
+  onRowClick?: (row: TRow) => void
+  clickable?: boolean
+}
+
 type DataTableCommonProps<TSource, TRow, TFilters> = {
   id: string
   columns: readonly DataTableColumn<TRow>[]
@@ -159,6 +163,7 @@ type DataTableCommonProps<TSource, TRow, TFilters> = {
   search?: DataTableSearchConfig
   selectable?: boolean
   rowActions?: (row: TRow) => ReactNode
+  rowInteraction?: DataTableRowInteraction<TRow>
   toolbarActions?: ReactNode
   bulkActions?: DataTableBulkActions<TRow>
   bulkDelete?: DataTableBulkDeleteConfig<TRow>
@@ -239,6 +244,7 @@ export type DataTableController<TRow, TFilters> = {
   toolbarActions?: ReactNode
   bulkActions?: DataTableBulkActions<TRow>
   bulkDeleteConfig?: DataTableBulkDeleteConfig<TRow>
+  rowInteraction?: DataTableRowInteraction<TRow>
   beforeTable?: ReactNode
   slots?: DataTableSlots
   ariaLabel: string

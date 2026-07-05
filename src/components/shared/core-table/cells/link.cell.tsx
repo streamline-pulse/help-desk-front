@@ -4,7 +4,7 @@ import { IconCopy } from "@tabler/icons-react"
 import { toast } from "sonner"
 
 import { CellShell, CellTruncate, isEmptyValue } from "@/components/shared/core-table/cells/cell.utils"
-import { Button } from "@/components/ui/button"
+import { IconButton } from "@/components/ui/icon-button"
 import { cn } from "@/lib/utils"
 
 async function copyToClipboard(value: string) {
@@ -48,6 +48,7 @@ export function LinkCell({
               "min-w-0 truncate text-sm text-primary underline-offset-4 hover:underline",
               className
             )}
+            data-table-interactive="true"
           >
             {displayValue}
           </a>
@@ -56,16 +57,17 @@ export function LinkCell({
             {displayValue}
           </CellTruncate>
         )}
-        <Button
+        <IconButton
           type="button"
           variant="ghost"
           size="icon-xs"
           className="size-5 shrink-0 opacity-0 transition-opacity group-hover/link:opacity-100 focus-visible:opacity-100"
-          aria-label={`Copier ${displayValue}`}
+          tooltip={`Copier ${displayValue}`}
+          data-table-interactive="true"
           onClick={() => void copyToClipboard(displayValue)}
         >
           <IconCopy className="size-3" stroke={1.75} />
-        </Button>
+        </IconButton>
       </div>
     </CellShell>
   )

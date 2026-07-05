@@ -20,6 +20,7 @@ import type {
   DataTableController,
   DataTableExportConfig,
   DataTableFilter,
+  DataTableRowInteraction,
   DataTableSearchConfig,
   DataTableSlots,
   DataTableState,
@@ -39,6 +40,7 @@ type UseDataTableOptions<TRow, TFilters> = {
   getRowId: (row: TRow) => string
   selectable: boolean
   rowActions?: (row: TRow) => React.ReactNode
+  rowInteraction?: DataTableRowInteraction<TRow>
   searchConfig?: DataTableSearchConfig
   pageSizeOptions: readonly number[]
   toolbarActions?: React.ReactNode
@@ -141,6 +143,7 @@ export function useDataTable<TRow, TFilters>({
   getRowId,
   selectable,
   rowActions,
+  rowInteraction,
   searchConfig,
   pageSizeOptions,
   toolbarActions,
@@ -319,6 +322,7 @@ export function useDataTable<TRow, TFilters>({
     toolbarActions,
     bulkActions,
     bulkDeleteConfig,
+    rowInteraction,
     beforeTable,
     slots,
     ariaLabel,

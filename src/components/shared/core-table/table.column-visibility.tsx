@@ -6,6 +6,7 @@ import type { DataTableColumnMeta } from "@/components/shared/core-table/table.t
 import { useDataTableContext } from "@/components/shared/core-table/table.provider"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { IconButtonTooltip } from "@/components/ui/icon-button"
 import {
   Popover,
   PopoverContent,
@@ -21,18 +22,20 @@ export function DataTableColumnVisibility<TRow, TFilters>() {
 
   return (
     <Popover>
-      <PopoverTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="text-muted-foreground hover:text-foreground"
-            aria-label="Colonnes visibles"
-          >
-            <IconColumns3 />
-          </Button>
-        }
-      />
+      <IconButtonTooltip label="Colonnes visibles">
+        <PopoverTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Colonnes visibles"
+            >
+              <IconColumns3 />
+            </Button>
+          }
+        />
+      </IconButtonTooltip>
       <PopoverContent align="end" className="w-52 gap-2 p-2">
         <PopoverHeader className="px-1">
           <PopoverTitle className="text-xs font-medium text-muted-foreground">

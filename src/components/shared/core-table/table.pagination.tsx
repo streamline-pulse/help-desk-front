@@ -4,6 +4,7 @@ import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
 
 import { useDataTableContext } from "@/components/shared/core-table/table.provider"
 import { Button } from "@/components/ui/button"
+import { IconButton } from "@/components/ui/icon-button"
 import {
   Pagination,
   PaginationContent,
@@ -79,16 +80,16 @@ export function DataTablePagination<TRow, TFilters>() {
         <Pagination className="mx-0 w-auto pl-3">
           <PaginationContent className="gap-1">
             <PaginationItem>
-              <Button
+              <IconButton
                 variant="ghost"
                 size="icon-sm"
                 className="text-muted-foreground"
                 disabled={pageIndex <= 0}
                 onClick={() => state.setPage(state.page - 1)}
-                aria-label="Page précédente"
+                tooltip="Page précédente"
               >
                 <IconChevronLeft />
-              </Button>
+              </IconButton>
             </PaginationItem>
             {items.map((item) =>
               typeof item === "string" ? (
@@ -116,16 +117,16 @@ export function DataTablePagination<TRow, TFilters>() {
               )
             )}
             <PaginationItem>
-              <Button
+              <IconButton
                 variant="ghost"
                 size="icon-sm"
                 className="text-muted-foreground"
                 disabled={pageIndex >= safePageCount - 1}
                 onClick={() => state.setPage(state.page + 1)}
-                aria-label="Page suivante"
+                tooltip="Page suivante"
               >
                 <IconChevronRight />
-              </Button>
+              </IconButton>
             </PaginationItem>
           </PaginationContent>
         </Pagination>

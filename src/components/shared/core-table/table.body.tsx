@@ -27,9 +27,18 @@ function StateRow({
   )
 }
 
+function isInteractiveTableTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false
+  return Boolean(
+    target.closest(
+      "[data-table-interactive='true'], [data-slot='checkbox'], [data-slot='button']"
+    )
+  )
+}
+
 export function DataTableBodyContent<TRow, TFilters>() {
   const controller = useDataTableContext<TRow, TFilters>()
-  const { table, isInitialLoading, error, slots, hasActiveCriteria, state } =
+  const { table, isInitialLoading, error, slots, hasActiveCriteria, state, rowInteraction } =
     controller
   const columnCount = Math.max(table.getVisibleLeafColumns().length, 1)
 
@@ -82,13 +91,28 @@ export function DataTableBodyContent<TRow, TFilters>() {
     )
   }
 
+  const rowClickable = Boolean(
+    rowInteraction?.onRowClick && rowInteraction.clickable !== false
+  )
+
   return (
     <TableBody>
       {table.getRowModel().rows.map((row) => (
         <TableRow
           key={row.id}
           data-state={row.getIsSelected() ? "selected" : undefined}
-          className="data-[state=selected]:bg-muted"
+          className={cn(
+            "data-[state=selected]:bg-muted",
+            rowClickable && "cursor-pointer hover:bg-muted/50"
+          )}
+          onClick={
+            rowInteraction?.onRowClick
+              ? (event) => {
+                  if (isInteractiveTableTarget(event.target)) return
+                  rowInteraction.onRowClick?.(row.original)
+                }
+              : undefined
+          }
         >
           {row.getVisibleCells().map((cell) => {
             const meta = cell.column.columnDef.meta as

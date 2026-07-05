@@ -9,6 +9,7 @@ import { DataTableSelectionActions } from "@/components/shared/core-table/table.
 import type { DataTableFilter } from "@/components/shared/core-table/table.types"
 import { DataTableFilter as FilterControl } from "@/components/shared/core-table/filters/table.filter"
 import { Button } from "@/components/ui/button"
+import { IconButton, IconButtonTooltip } from "@/components/ui/icon-button"
 import { FieldGroup } from "@/components/ui/field"
 import {
   InputGroup,
@@ -63,15 +64,15 @@ function ActiveFilters<TRow, TFilters>() {
         <span className="ml-1 text-muted-foreground">
           {filterDisplayValue(filter, value)}
         </span>
-        <Button
+        <IconButton
           variant="ghost"
           size="icon-xs"
           className="size-6 rounded-full text-muted-foreground hover:text-foreground"
           onClick={() => state.clearFilter(filter.key)}
-          aria-label={`Supprimer le filtre ${filter.label}`}
+          tooltip={`Supprimer le filtre ${filter.label}`}
         >
           <IconX />
-        </Button>
+        </IconButton>
       </span>
     )
   })
@@ -84,23 +85,27 @@ function FiltersPopover<TRow, TFilters>() {
 
   return (
     <Popover>
-      <PopoverTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="relative text-muted-foreground hover:text-foreground"
-            aria-label={`Filtres${state.activeFilterCount ? ` (${state.activeFilterCount} actifs)` : ""}`}
-          >
-            <IconFilter />
-            {state.activeFilterCount > 0 ? (
-              <span className="absolute top-0 right-0 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground tabular-nums">
-                {state.activeFilterCount}
-              </span>
-            ) : null}
-          </Button>
-        }
-      />
+      <IconButtonTooltip
+        label={`Filtres${state.activeFilterCount ? ` (${state.activeFilterCount} actifs)` : ""}`}
+      >
+        <PopoverTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="relative text-muted-foreground hover:text-foreground"
+              aria-label={`Filtres${state.activeFilterCount ? ` (${state.activeFilterCount} actifs)` : ""}`}
+            >
+              <IconFilter />
+              {state.activeFilterCount > 0 ? (
+                <span className="absolute top-0 right-0 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground tabular-nums">
+                  {state.activeFilterCount}
+                </span>
+              ) : null}
+            </Button>
+          }
+        />
+      </IconButtonTooltip>
       <PopoverContent align="end" className="w-72 gap-3 p-3">
         <PopoverHeader>
           <PopoverTitle>Filtres</PopoverTitle>

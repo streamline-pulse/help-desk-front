@@ -15,13 +15,14 @@ export function DataTableBulkDeleteButton<TRow, TFilters>() {
 
   if (!bulkDeleteConfig) return null
 
+  const deleteConfig = bulkDeleteConfig
   const count = selectedRows.length
-  const isPending = bulkDeleteConfig.isPending ?? false
-  const level: DeleteConfirmationLevel = bulkDeleteConfig.level ?? "confirm"
+  const isPending = deleteConfig.isPending ?? false
+  const level: DeleteConfirmationLevel = deleteConfig.level ?? "confirm"
 
   async function handleConfirm() {
     try {
-      await bulkDeleteConfig.onDelete(selectedRows)
+      await deleteConfig.onDelete(selectedRows)
       clearSelection()
       setOpen(false)
     } catch {
@@ -37,7 +38,7 @@ export function DataTableBulkDeleteButton<TRow, TFilters>() {
         className="text-destructive hover:bg-destructive/10 hover:text-destructive"
         disabled={count === 0 || isPending}
         onClick={() => {
-          bulkDeleteConfig.onReset?.()
+          deleteConfig.onReset?.()
           setOpen(true)
         }}
       >

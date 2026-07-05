@@ -95,6 +95,7 @@ function ClientDataTable<TSource, TRow, TFilters>({
     getRowId: props.getRowId,
     selectable: props.selectable ?? Boolean(props.bulkActions ?? props.bulkDelete),
     rowActions: props.rowActions,
+    rowInteraction: props.rowInteraction,
     searchConfig: props.search,
     pageSizeOptions: props.pageSizeOptions ?? [5, 10, 20],
     toolbarActions: props.toolbarActions,
