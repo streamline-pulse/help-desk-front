@@ -8,9 +8,11 @@ import {
   IconSettings,
   IconShieldLock,
   IconTicket,
+  IconUser,
   IconUserHeart,
   IconUsers,
   IconUsersGroup,
+  IconCategory,
 } from "@tabler/icons-react"
 
 import { routes } from "@/config/routes"
@@ -18,6 +20,7 @@ import { routes } from "@/config/routes"
 export const moduleCodes = {
   dashboard: "DASHBOARD",
   employees: "EMPLOYEES",
+  users: "USERS",
   requests: "REQUESTS",
   inbox: "INBOX",
   customers: "CUSTOMERS",
@@ -27,6 +30,7 @@ export const moduleCodes = {
   settings: "SETTINGS",
   configuration: "CONFIGURATION",
   roles: "ROLES",
+  groupConfiguration: "GROUP_CONFIGURATION",
 } as const
 
 export type ModuleCode = (typeof moduleCodes)[keyof typeof moduleCodes]
@@ -55,6 +59,13 @@ export const navigationItems = [
     isReady: true,
   },
   {
+    title: "Utilisateurs",
+    url: routes.users.all,
+    icon: IconUser,
+    moduleCode: moduleCodes.users,
+    isReady: true,
+  },
+  {
     title: "Configuration",
     url: routes.board.configuration.root,
     icon: IconAdjustments,
@@ -66,6 +77,13 @@ export const navigationItems = [
     url: routes.board.roles.root,
     icon: IconShieldLock,
     moduleCode: moduleCodes.roles,
+    isReady: true,
+  },
+  {
+    title: "Configuration des groupes",
+    url: routes.board.groupConfiguration.root,
+    icon: IconCategory,
+    moduleCode: moduleCodes.groupConfiguration,
     isReady: true,
   },
   {

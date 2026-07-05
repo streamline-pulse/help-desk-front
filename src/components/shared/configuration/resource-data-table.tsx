@@ -94,7 +94,12 @@ function columnsFor(
       updatedAt,
     ]
   }
-  if (resource === "modules" || resource === "permissions") {
+  if (
+    resource === "modules" ||
+    resource === "permissions" ||
+    resource === "group-modules" ||
+    resource === "group-permissions"
+  ) {
     return [
       {
         accessorKey: "label",

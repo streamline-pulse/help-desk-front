@@ -5,6 +5,11 @@ import type { Permission } from "@/types/api/permission.type"
 import type { Region } from "@/types/api/region.type"
 import type { Role } from "@/types/api/role.type"
 import type { Town } from "@/types/api/town.type"
+import type {
+  GroupModule,
+  GroupPermission,
+  GroupType,
+} from "@/types/api/group-configuration.type"
 
 export type ConfigurationResource =
   | "languages"
@@ -14,9 +19,21 @@ export type ConfigurationResource =
   | "modules"
   | "permissions"
   | "roles"
+  | "group-types"
+  | "group-modules"
+  | "group-permissions"
 
 export type ConfigurationEntity =
-  Language | Country | Region | Town | Module | Permission | Role
+  | Language
+  | Country
+  | Region
+  | Town
+  | Module
+  | Permission
+  | Role
+  | GroupType
+  | GroupModule
+  | GroupPermission
 
 export type ConfigurationFilters = {
   countries?: string[]

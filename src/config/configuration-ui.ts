@@ -81,6 +81,33 @@ export const configurationUi = {
     description: "Composez les droits attribués aux utilisateurs par module.",
     fields: [{ name: "name", label: "Nom", placeholder: "Administrateur" }],
   },
+  "group-types": {
+    title: "Types",
+    singular: "type de groupe",
+    description:
+      "Définissez les catégories utilisées pour structurer les groupes.",
+    fields: [{ name: "name", label: "Nom", placeholder: "Organisation" }],
+  },
+  "group-modules": {
+    title: "Modules",
+    singular: "module de groupe",
+    description:
+      "Déclarez les domaines fonctionnels disponibles dans les groupes.",
+    fields: [
+      { name: "label", label: "Libellé", placeholder: "Membres" },
+      { name: "name", label: "Code", placeholder: "MEMBERS" },
+    ],
+  },
+  "group-permissions": {
+    title: "Permissions",
+    singular: "permission de groupe",
+    description:
+      "Définissez les actions attribuables aux rôles internes des groupes.",
+    fields: [
+      { name: "label", label: "Libellé", placeholder: "Inviter" },
+      { name: "name", label: "Code", placeholder: "INVITE" },
+    ],
+  },
 } as const satisfies Record<
   ConfigurationResource,
   {
@@ -102,4 +129,10 @@ export const accessControlMenuResources = [
   "roles",
   "modules",
   "permissions",
+] as const satisfies readonly ConfigurationResource[]
+
+export const groupConfigurationMenuResources = [
+  "group-types",
+  "group-modules",
+  "group-permissions",
 ] as const satisfies readonly ConfigurationResource[]

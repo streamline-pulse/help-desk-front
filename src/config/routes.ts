@@ -11,6 +11,10 @@ export const routes = {
       root: "/board/roles",
       resource: (resource: string) => `/board/roles/${resource}`,
     },
+    groupConfiguration: {
+      root: "/board/group-configuration",
+      resource: (resource: string) => `/board/group-configuration/${resource}`,
+    },
   },
 
   auth: {

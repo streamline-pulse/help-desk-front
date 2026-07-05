@@ -1,4 +1,5 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -174,19 +175,19 @@ src/
 
 Utiliser le **kebab-case**.
 
-| Élément | Convention |
-|----------|------------|
-| Type API | `<resource>.type.ts` |
-| Schéma | `<resource>.schema.ts` |
-| Service | `<resource>.service.ts` |
+| Élément    | Convention                |
+| ---------- | ------------------------- |
+| Type API   | `<resource>.type.ts`      |
+| Schéma     | `<resource>.schema.ts`    |
+| Service    | `<resource>.service.ts`   |
 | Hook Query | `use-<resource>.query.ts` |
-| Hook | `use-<feature>.ts` |
-| Store | `<resource>.store.ts` |
-| Provider | `<name>.provider.tsx` |
-| Formulaire | `<name>.form.tsx` |
-| Modal | `<name>.modal.tsx` |
-| Table | `<name>.table.tsx` |
-| Header | `<name>.header.tsx` |
+| Hook       | `use-<feature>.ts`        |
+| Store      | `<resource>.store.ts`     |
+| Provider   | `<name>.provider.tsx`     |
+| Formulaire | `<name>.form.tsx`         |
+| Modal      | `<name>.modal.tsx`        |
+| Table      | `<name>.table.tsx`        |
+| Header     | `<name>.header.tsx`       |
 
 Règles :
 
@@ -246,6 +247,8 @@ Règles :
 - Afficher les erreurs serveur lorsqu'elles existent.
 - Désactiver les actions pendant la soumission.
 - Séparer validation, logique métier et présentation.
+- Dans les champs de sélection, séparer systématiquement la valeur technique du libellé visible : l'identifiant, le slug ou le code est envoyé à l'API, tandis qu'un libellé métier compréhensible est affiché à l'utilisateur dans la liste et dans la valeur sélectionnée.
+- Ne jamais afficher directement un identifiant, un slug ou un code technique comme valeur sélectionnée lorsqu'un libellé métier est disponible.
 
 ---
 

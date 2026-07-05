@@ -41,6 +41,10 @@ import { permissionSchema } from "@/schemas/permission.schema"
 import { regionSchema } from "@/schemas/region.schema"
 import { roleSchema } from "@/schemas/role.schema"
 import { townSchema } from "@/schemas/town.schema"
+import {
+  groupCapabilitySchema,
+  groupTypeSchema,
+} from "@/schemas/group-configuration.schema"
 import type { Country } from "@/types/api/country.type"
 import type { Module } from "@/types/api/module.type"
 import type { Permission } from "@/types/api/permission.type"
@@ -86,7 +90,12 @@ function entityDefaults(
           : "",
     }
   }
-  if (resource === "modules" || resource === "permissions") {
+  if (
+    resource === "modules" ||
+    resource === "permissions" ||
+    resource === "group-modules" ||
+    resource === "group-permissions"
+  ) {
     return {
       ...base,
       label:
@@ -160,6 +169,9 @@ export function ResourceFormDialog({
         modules: moduleSchema,
         permissions: permissionSchema,
         roles: roleSchema,
+        "group-types": groupTypeSchema,
+        "group-modules": groupCapabilitySchema,
+        "group-permissions": groupCapabilitySchema,
       }
       const parsed = schemas[resource].safeParse(value)
       if (!parsed.success) {
@@ -256,7 +268,12 @@ export function ResourceFormDialog({
                           className="w-full"
                           aria-invalid={Boolean(errors[definition.name])}
                         >
-                          <SelectValue placeholder={definition.placeholder} />
+                          <SelectValue placeholder={definition.placeholder}>
+                            {optionsFor(definition.optionsResource).find(
+                              (option) =>
+                                option.value === String(field.state.value ?? "")
+                            )?.label ?? definition.placeholder}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {optionsFor(definition.optionsResource).map(

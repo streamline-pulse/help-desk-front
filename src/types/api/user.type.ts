@@ -32,3 +32,5 @@ export type AuthUser = {
 export type CurrentUserResponse = {
   data: AuthUser
 }
+
+export type User = AuthUser
