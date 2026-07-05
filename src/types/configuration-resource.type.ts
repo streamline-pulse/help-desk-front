@@ -5,11 +5,9 @@ import type { Permission } from "@/types/api/permission.type"
 import type { Region } from "@/types/api/region.type"
 import type { Role } from "@/types/api/role.type"
 import type { Town } from "@/types/api/town.type"
-import type {
-  GroupModule,
-  GroupPermission,
-  GroupType,
-} from "@/types/api/group-configuration.type"
+import type { GroupModule } from "@/types/api/group-module.type"
+import type { GroupPermission } from "@/types/api/group-permission.type"
+import type { GroupType } from "@/types/api/group-type.type"
 
 export type ConfigurationResource =
   | "languages"

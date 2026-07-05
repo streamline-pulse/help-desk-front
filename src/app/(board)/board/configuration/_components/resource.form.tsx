@@ -34,10 +34,9 @@ import { permissionSchema } from "@/schemas/permission.schema"
 import { regionSchema } from "@/schemas/region.schema"
 import { roleSchema } from "@/schemas/role.schema"
 import { townSchema } from "@/schemas/town.schema"
-import {
-  groupCapabilitySchema,
-  groupTypeSchema,
-} from "@/schemas/group-configuration.schema"
+import { groupModuleSchema } from "@/schemas/group-module.schema"
+import { groupPermissionSchema } from "@/schemas/group-permission.schema"
+import { groupTypeSchema } from "@/schemas/group-type.schema"
 import type { Country } from "@/types/api/country.type"
 import type { Module } from "@/types/api/module.type"
 import type { Permission } from "@/types/api/permission.type"
@@ -161,8 +160,8 @@ export function ResourceForm({
         permissions: permissionSchema,
         roles: roleSchema,
         "group-types": groupTypeSchema,
-        "group-modules": groupCapabilitySchema,
-        "group-permissions": groupCapabilitySchema,
+        "group-modules": groupModuleSchema,
+        "group-permissions": groupPermissionSchema,
       }
       const parsed = schemas[resource].safeParse(value)
       if (!parsed.success) {
