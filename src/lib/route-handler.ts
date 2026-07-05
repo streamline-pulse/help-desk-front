@@ -57,7 +57,14 @@ export async function apiErrorResponse(error: unknown) {
   const normalized = await normalizeApiError(error)
 
   return NextResponse.json(
-    { code: normalized.code, message: normalized.message },
+    {
+      code: normalized.code,
+      message: normalized.message,
+      ...(normalized.data !== undefined ? { data: normalized.data } : {}),
+      ...(normalized.fieldErrors
+        ? { fieldErrors: normalized.fieldErrors }
+        : {}),
+    },
     { status: normalized.status || 503 }
   )
 }

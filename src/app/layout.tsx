@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { QueryProvider } from "@/provider/query.provider"
 import { Toaster } from "sonner"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 const interHeading = Inter({subsets:['latin'],variable:'--font-heading'});
 
@@ -29,10 +30,12 @@ export default function RootLayout({
     >
       <body>
         <QueryProvider>
-          <ThemeProvider>
-            <TooltipProvider>{children}</TooltipProvider>
-            <Toaster />
-          </ThemeProvider>
+          <NuqsAdapter>
+            <ThemeProvider>
+              <TooltipProvider>{children}</TooltipProvider>
+              <Toaster />
+            </ThemeProvider>
+          </NuqsAdapter>
         </QueryProvider>
 
       </body>
