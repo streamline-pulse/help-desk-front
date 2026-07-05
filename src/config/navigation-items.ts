@@ -1,10 +1,12 @@
 import type { TablerIcon } from "@tabler/icons-react"
 import {
   IconChartBar,
+  IconAdjustments,
   IconChecklist,
   IconInbox,
   IconLayoutDashboard,
   IconSettings,
+  IconShieldLock,
   IconTicket,
   IconUserHeart,
   IconUsers,
@@ -23,6 +25,8 @@ export const moduleCodes = {
   teams: "TEAMS",
   statistics: "STATISTICS",
   settings: "SETTINGS",
+  configuration: "CONFIGURATION",
+  roles: "ROLES",
 } as const
 
 export type ModuleCode = (typeof moduleCodes)[keyof typeof moduleCodes]
@@ -48,6 +52,20 @@ export const navigationItems = [
     url: routes.board.employees,
     icon: IconUsers,
     moduleCode: moduleCodes.employees,
+    isReady: true,
+  },
+  {
+    title: "Configuration",
+    url: routes.board.configuration.root,
+    icon: IconAdjustments,
+    moduleCode: moduleCodes.configuration,
+    isReady: true,
+  },
+  {
+    title: "Rôles et permissions",
+    url: routes.board.roles.root,
+    icon: IconShieldLock,
+    moduleCode: moduleCodes.roles,
     isReady: true,
   },
   {

@@ -16,8 +16,11 @@ export async function POST(request: NextRequest) {
   if (input instanceof NextResponse) return input
 
   try {
-    await authService.resendVerification(input)
-    return NextResponse.json({ success: true as const })
+    const result = await authService.resendVerification(input)
+    return NextResponse.json({
+      success: true as const,
+      message: result.message ?? undefined,
+    })
   } catch (error) {
     return apiErrorResponse(error)
   }

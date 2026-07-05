@@ -6,23 +6,30 @@ export type ApiPagedResponse<T> = {
   pages?: number
 }
 
+export type ApiTimestamp = string | number
+
 export type ApiEntityResponse<T> = {
   data?: T | null
+  message?: string | null
+}
+
+export type ApiMutationResult<T> = {
+  data: T | null
+  message?: string
 }
 
 export type ApiListParamValue =
-  | string
-  | number
-  | boolean
-  | readonly string[]
-  | readonly number[]
+  string | number | boolean | readonly string[] | readonly number[]
 
 export type ApiListParams<TFilters = Record<string, never>> = {
   page: number
   perPage: number
   search?: string
   filters?: Partial<
-    Record<Extract<keyof TFilters, string>, ApiListParamValue | null | undefined>
+    Record<
+      Extract<keyof TFilters, string>,
+      ApiListParamValue | null | undefined
+    >
   >
 }
 
@@ -48,10 +55,7 @@ export type ResourceDataSource<
     request: ApiListParams<TFilters>,
     options?: ApiRequestOptions
   ) => Promise<PageResult<TEntity>>
-  get?: (
-    id: string,
-    options?: ApiRequestOptions
-  ) => Promise<TEntity | null>
+  get?: (id: string, options?: ApiRequestOptions) => Promise<TEntity | null>
   create?: (input: TCreateInput) => Promise<TEntity>
   update?: (id: string, input: TUpdateInput) => Promise<TEntity>
   remove?: (id: string) => Promise<TEntity | null>

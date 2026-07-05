@@ -3,6 +3,14 @@ export const routes = {
   board: {
     root: "/board",
     employees: "/board/employees",
+    configuration: {
+      root: "/board/configuration",
+      resource: (resource: string) => `/board/configuration/${resource}`,
+    },
+    roles: {
+      root: "/board/roles",
+      resource: (resource: string) => `/board/roles/${resource}`,
+    },
   },
 
   auth: {

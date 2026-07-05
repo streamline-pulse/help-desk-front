@@ -17,8 +17,11 @@ export async function POST(request: NextRequest) {
   if (input instanceof NextResponse) return input
 
   try {
-    await authService.sendResetEmail(input)
-    return NextResponse.json({ success: true as const })
+    const result = await authService.sendResetEmail(input)
+    return NextResponse.json({
+      success: true as const,
+      message: result.message ?? undefined,
+    })
   } catch (error) {
     const normalized = await normalizeApiError(error)
 

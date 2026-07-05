@@ -1,5 +1,6 @@
 import type {
   ApiEntityResponse,
+  ApiMutationResult,
   ApiPagedResponse,
   PageResult,
 } from "@/types/api/api-data.type"
@@ -16,4 +17,13 @@ export function normalizePage<T>(response: ApiPagedResponse<T>): PageResult<T> {
 
 export function normalizeEntity<T>(response: ApiEntityResponse<T>): T | null {
   return response.data ?? null
+}
+
+export function normalizeMutation<T>(
+  response: ApiEntityResponse<T>
+): ApiMutationResult<T> {
+  return {
+    data: normalizeEntity(response),
+    ...(response.message?.trim() ? { message: response.message.trim() } : {}),
+  }
 }

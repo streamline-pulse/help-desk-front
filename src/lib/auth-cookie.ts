@@ -1,6 +1,8 @@
 import type { NextResponse } from "next/server"
 
-export const AUTH_COOKIE_NAME = "help-desk-session"
+import { AUTH_COOKIE_NAME } from "@/config/auth"
+
+export { AUTH_COOKIE_NAME }
 
 const MAX_PERSISTENT_AGE_SECONDS = 60 * 60 * 24 * 30
 
@@ -40,7 +42,7 @@ export function setAuthCookie(
   response.cookies.set({
     name: AUTH_COOKIE_NAME,
     value: token,
-    httpOnly: true,
+    httpOnly: false,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
@@ -53,7 +55,7 @@ export function clearAuthCookie(response: NextResponse) {
   response.cookies.set({
     name: AUTH_COOKIE_NAME,
     value: "",
-    httpOnly: true,
+    httpOnly: false,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",

@@ -37,12 +37,15 @@ export const authBffService = {
       json: input,
     }),
   resendVerification: (input: EmailRequest) =>
-    request<{ success: true }>("/api/auth/resend-verification", {
-      method: "post",
-      json: input,
-    }),
+    request<{ success: true; message?: string }>(
+      "/api/auth/resend-verification",
+      {
+        method: "post",
+        json: input,
+      }
+    ),
   sendResetEmail: (input: EmailRequest) =>
-    request<{ success: true }>("/api/auth/forgot-password", {
+    request<{ success: true; message?: string }>("/api/auth/forgot-password", {
       method: "post",
       json: input,
     }),
