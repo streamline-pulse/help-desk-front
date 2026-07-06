@@ -196,6 +196,7 @@ export function UserTable() {
         toolbarActions={
           <Button
             size="sm"
+            data-onboarding="create-user"
             onClick={() => {
               setEditing(null)
               setFormOpen(true)

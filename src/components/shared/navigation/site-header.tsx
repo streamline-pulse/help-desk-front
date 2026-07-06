@@ -9,6 +9,7 @@ import { BoardSearchCommand } from "@/components/shared/navigation/board-search-
 import {
   getBoardBreadcrumbs,
   getGroupIdFromPathname,
+  isGroupSpacePathname,
 } from "@/config/board-breadcrumbs"
 import {
   Breadcrumb,
@@ -31,6 +32,7 @@ import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { routes } from "@/config/routes"
 import { useGroupQuery } from "@/hooks/queries/use-group.query"
+import { useCurrentGroup } from "@/hooks/use-current-group"
 import {
   IconChevronDown,
   IconClock,
@@ -82,8 +84,12 @@ export function SiteHeader() {
   const { toggleSidebar } = useSidebar()
   const [searchOpen, setSearchOpen] = useState(false)
   const groupId = getGroupIdFromPathname(pathname)
+  const currentGroup = useCurrentGroup()
   const groupQuery = useGroupQuery(groupId ?? "")
-  const breadcrumbs = getBreadcrumbs(pathname, groupQuery.data?.name)
+  const groupName = isGroupSpacePathname(pathname)
+    ? currentGroup.currentGroup?.name
+    : groupQuery.data?.name
+  const breadcrumbs = getBreadcrumbs(pathname, groupName)
   const isEmployeesPage = pathname === routes.board.employees
 
   async function handleCopyPageLink() {
@@ -141,6 +147,7 @@ export function SiteHeader() {
             <Button
               variant="secondary"
               className="hidden w-64 justify-start text-muted-foreground lg:inline-flex"
+              data-onboarding="global-search"
               onClick={() => setSearchOpen(true)}
             >
               <IconSearch data-icon="inline-start" />
@@ -152,6 +159,7 @@ export function SiteHeader() {
               size="icon-sm"
               className="size-8 text-muted-foreground lg:hidden"
               aria-label="Rechercher"
+              data-onboarding="global-search"
               onClick={() => setSearchOpen(true)}
             >
               <IconSearch />

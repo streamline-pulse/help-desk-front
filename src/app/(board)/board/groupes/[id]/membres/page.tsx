@@ -1,5 +1,4 @@
-import { GroupDetailSection } from "@/app/(board)/board/groupes/_components/group-detail.section"
-import { GroupMemberTable } from "@/app/(board)/board/groupes/_components/group-member.table"
+import { GroupResourceSection } from "@/app/(board)/board/groupes/_components/group-resource-section"
 
 export default async function GroupMembersPage({
   params,
@@ -8,9 +7,5 @@ export default async function GroupMembersPage({
 }) {
   const { id } = await params
 
-  return (
-    <GroupDetailSection groupId={id} section="membres">
-      <GroupMemberTable groupId={id} />
-    </GroupDetailSection>
-  )
+  return <GroupResourceSection groupId={id} resource="membres" />
 }

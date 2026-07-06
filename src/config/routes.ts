@@ -3,6 +3,13 @@ export const routes = {
   board: {
     root: "/board",
     profile: "/board/profil",
+    groupSpace: {
+      root: "/board/groupe",
+      roles: "/board/groupe/roles",
+      members: "/board/groupe/membres",
+      invitations: "/board/groupe/invitations",
+      files: "/board/groupe/fichiers",
+    },
     employees: "/board/employees",
     configuration: {
       root: "/board/configuration",

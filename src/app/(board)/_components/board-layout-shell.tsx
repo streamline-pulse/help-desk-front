@@ -1,7 +1,13 @@
+"use client"
+
+import type { ReactNode } from "react"
+
+import { OnboardingProvider } from "@/components/shared/onboarding/onboarding-provider"
+
 type BoardLayoutShellProps = {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function BoardLayoutShell({ children }: BoardLayoutShellProps) {
-  return children
+  return <OnboardingProvider>{children}</OnboardingProvider>
 }

@@ -20,6 +20,7 @@ const groupSectionLabels: Record<string, string> = {
   roles: groupDetailUi.roles.title,
   membres: groupDetailUi.membres.title,
   invitations: groupDetailUi.invitations.title,
+  fichiers: groupDetailUi.fichiers.title,
 }
 
 export function getBoardBreadcrumbs(
@@ -40,6 +41,26 @@ export function getBoardBreadcrumbs(
 
   if (pathname === routes.board.groups.root) {
     return withBoardRoot([{ label: "Groupes" }])
+  }
+
+  if (pathname === routes.board.groupSpace.root) {
+    return withBoardRoot([{ label: "Espace groupe" }])
+  }
+
+  const groupSpaceMatch = pathname.match(/^\/board\/groupe\/([^/]+)$/)
+  if (groupSpaceMatch) {
+    const section = groupSpaceMatch[1]
+    const groupLabel = options?.groupName?.trim() || "Groupe actif"
+    const crumbs: BreadcrumbItem[] = [
+      { label: "Espace groupe", href: routes.board.groupSpace.root },
+      { label: groupLabel, href: routes.board.groupSpace.roles },
+    ]
+
+    if (groupSectionLabels[section]) {
+      crumbs.push({ label: groupSectionLabels[section] })
+    }
+
+    return withBoardRoot(crumbs)
   }
 
   const groupMatch = pathname.match(/^\/board\/groupes\/([^/]+)(?:\/([^/]+))?$/)
@@ -126,4 +147,11 @@ export function getBoardBreadcrumbs(
 
 export function getGroupIdFromPathname(pathname: string) {
   return pathname.match(/^\/board\/groupes\/([^/]+)/)?.[1]
+}
+
+export function isGroupSpacePathname(pathname: string) {
+  return (
+    pathname === routes.board.groupSpace.root ||
+    pathname.startsWith(`${routes.board.groupSpace.root}/`)
+  )
 }

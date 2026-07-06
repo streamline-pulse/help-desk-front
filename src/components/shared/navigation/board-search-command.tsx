@@ -15,6 +15,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command"
 import { routes } from "@/config/routes"
+import { emitOnboardingEvent, onboardingEvents } from "@/lib/onboarding-events"
 import { IconLayoutDashboard, IconUsers } from "@tabler/icons-react"
 
 type BoardSearchCommandProps = {
@@ -27,6 +28,12 @@ export function BoardSearchCommand({
   onOpenChange,
 }: BoardSearchCommandProps) {
   const router = useRouter()
+
+  useEffect(() => {
+    if (open) {
+      emitOnboardingEvent(onboardingEvents.searchOpened)
+    }
+  }, [open])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {

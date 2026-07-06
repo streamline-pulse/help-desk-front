@@ -11,7 +11,24 @@ import {
 } from "@/config/group-ui"
 import { routes } from "@/config/routes"
 
-function groupResourceHref(groupId: string, resource: GroupDetailResource) {
+function groupResourceHref(
+  groupId: string,
+  resource: GroupDetailResource,
+  mode: "admin" | "group-space"
+) {
+  if (mode === "group-space") {
+    switch (resource) {
+      case "roles":
+        return routes.board.groupSpace.roles
+      case "membres":
+        return routes.board.groupSpace.members
+      case "invitations":
+        return routes.board.groupSpace.invitations
+      case "fichiers":
+        return routes.board.groupSpace.files
+    }
+  }
+
   switch (resource) {
     case "roles":
       return routes.board.groups.roles(groupId)
@@ -24,7 +41,13 @@ function groupResourceHref(groupId: string, resource: GroupDetailResource) {
   }
 }
 
-export function GroupNav({ groupId }: { groupId: string }) {
+export function GroupNav({
+  groupId,
+  mode = "admin",
+}: {
+  groupId: string
+  mode?: "admin" | "group-space"
+}) {
   const pathname = usePathname()
 
   return (
@@ -33,7 +56,7 @@ export function GroupNav({ groupId }: { groupId: string }) {
       aria-label="Gestion du groupe"
     >
       {groupDetailMenuResources.map((resource) => {
-        const href = groupResourceHref(groupId, resource)
+        const href = groupResourceHref(groupId, resource, mode)
         return (
           <Button
             key={resource}

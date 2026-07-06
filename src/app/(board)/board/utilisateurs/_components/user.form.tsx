@@ -30,6 +30,7 @@ import {
 } from "@/schemas/user.schema"
 import type { Role } from "@/types/api/role.type"
 import type { User } from "@/types/api/user.type"
+import { onboardingEvents, emitOnboardingEvent } from "@/lib/onboarding-events"
 import { getZodFormErrors, type FormErrors } from "@/utils/form-validation"
 
 type Mutation<T> = {
@@ -91,6 +92,7 @@ export function UserForm({
           })
         } else {
           await createMutation.mutateAsync(parsed.data as CreateUserInput)
+          emitOnboardingEvent(onboardingEvents.userCreated)
         }
         close()
       } catch (error) {

@@ -5,13 +5,16 @@ import { usePathname } from "next/navigation"
 
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import type { NavigationItem } from "@/config/navigation-items"
+import {
+  isNavigationLinkItem,
+  type NavigationItem,
+  type NavigationLinkItem,
+} from "@/config/navigation-items"
 import { IconLock } from "@tabler/icons-react"
 
 export function NavMain({
@@ -20,7 +23,9 @@ export function NavMain({
   items: readonly NavigationItem[]
 }) {
   const pathname = usePathname()
-  const activeItem = items.reduce<NavigationItem | undefined>(
+  const activeItem = items
+    .filter(isNavigationLinkItem)
+    .reduce<NavigationLinkItem | undefined>(
     (currentActiveItem, item) => {
       const matchesPathname =
         pathname === item.url ||
@@ -40,10 +45,19 @@ export function NavMain({
   )
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Modules</SidebarGroupLabel>
+    <SidebarGroup data-onboarding="sidebar-navigation">
       <SidebarMenu>
         {items.map((item) => {
+          if (!isNavigationLinkItem(item)) {
+            return (
+              <SidebarMenuItem key={item.id}>
+                <div className="px-2 pt-4 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground/80">
+                  {item.title}
+                </div>
+              </SidebarMenuItem>
+            )
+          }
+
           const Icon = item.icon
           const isActive = item.moduleCode === activeItem?.moduleCode
 

@@ -24,6 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import { emitOnboardingEvent, onboardingEvents } from "@/lib/onboarding-events"
 
 function filterDisplayValue<TFilters>(
   filter: DataTableFilter<TFilters>,
@@ -158,8 +159,14 @@ export function DataTableToolbar<TRow, TFilters>({
                 </InputGroupAddon>
                 <InputGroupInput
                   type="search"
+                  data-onboarding="table-search"
                   value={state.search}
-                  onChange={(event) => state.setSearch(event.target.value)}
+                  onChange={(event) => {
+                    state.setSearch(event.target.value)
+                    if (event.target.value.trim().length >= 2) {
+                      emitOnboardingEvent(onboardingEvents.tableSearchUsed)
+                    }
+                  }}
                   placeholder={searchConfig?.placeholder ?? "Rechercher…"}
                   aria-label={searchConfig?.placeholder ?? "Rechercher"}
                 />
