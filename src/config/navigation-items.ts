@@ -60,12 +60,20 @@ export const navigationItems = [
     isReady: true,
   },
   {
+    title: "Groupes",
+    url: routes.board.groups.root,
+    icon: IconUsersGroup,
+    moduleCode: moduleCodes.groups,
+    isReady: true,
+  },
+  {
     title: "Utilisateurs",
     url: routes.board.users,
     icon: IconUser,
     moduleCode: moduleCodes.users,
     isReady: true,
   },
+
   {
     title: "Rôles et permissions",
     url: routes.board.roles.root,
@@ -73,13 +81,7 @@ export const navigationItems = [
     moduleCode: moduleCodes.roles,
     isReady: true,
   },
-  {
-    title: "Groupes",
-    url: routes.board.groups.root,
-    icon: IconUsersGroup,
-    moduleCode: moduleCodes.groups,
-    isReady: true,
-  },
+
   {
     title: "Configuration des groupes",
     url: routes.board.groupConfiguration.root,

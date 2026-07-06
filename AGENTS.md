@@ -324,27 +324,11 @@ Tous les textes peuvent être écrits directement dans les composants.
 # Validation
 
 Avant de terminer :
-
+NB: Quand les modifications le necessite 
 1. Vérifier le diff.
 2. Vérifier les types.
 3. Vérifier les imports.
 4. Vérifier les conventions.
-5. Exécuter le build ou le lint lorsque cela est autorisé.
-
----
-
-# Décisions propres au projet
-
-- **Authentification** : À définir
-- **Client HTTP** : Ky
-- **Gestion des erreurs** : Centralisée via le client Ky et TanStack Query
-- **Notifications** : À définir
-- **Permissions** : À définir
-- **Persistance locale** : Zustand Persist (uniquement si nécessaire)
-- **Pagination** : TanStack Query
-- **Tests** : À définir
-- **Déploiement** : À définir
-
----
+5. Exécuter le build ou le lint lorsque cela est autorisé et necessaire.
 
 <!-- END:nextjs-agent-rules -->

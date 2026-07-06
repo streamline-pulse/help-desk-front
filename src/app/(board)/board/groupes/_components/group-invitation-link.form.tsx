@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { IconCopy } from "@tabler/icons-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { DialogFooter } from "@/components/ui/dialog"
@@ -17,6 +18,15 @@ import { IconButton } from "@/components/ui/icon-button"
 import { routes } from "@/config/routes"
 import { useGenerateGroupInvitationMutation } from "@/hooks/queries/use-group-invitation.query"
 import type { GroupRole } from "@/types/api/group-role.type"
+
+async function copyInvitationLink(value: string) {
+  try {
+    await navigator.clipboard.writeText(value)
+    toast.success("Lien d’invitation copié")
+  } catch {
+    toast.error("Impossible de copier le lien d’invitation")
+  }
+}
 
 export function GroupInvitationLinkForm({
   groupId,
@@ -78,7 +88,7 @@ export function GroupInvitationLinkForm({
             type="button"
             variant="outline"
             tooltip="Copier le lien d’invitation"
-            onClick={() => void navigator.clipboard.writeText(generatedLink)}
+            onClick={() => void copyInvitationLink(generatedLink)}
           >
             <IconCopy className="size-3.5" stroke={1.75} aria-hidden="true" />
           </IconButton>
