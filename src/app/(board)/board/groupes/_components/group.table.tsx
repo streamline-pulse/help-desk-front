@@ -15,7 +15,7 @@ import {
   TableActionsCell,
 } from "@/components/shared/core-table/cells/actions.cell"
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
-import { DetailTriggerCell } from "@/components/shared/core-table/cells/detail-trigger.cell"
+import { PageLinkTriggerCell } from "@/components/shared/core-table/cells/page-link-trigger.cell"
 import { RelationCell } from "@/components/shared/core-table/cells/relation.cell"
 import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
@@ -62,14 +62,14 @@ export function GroupTable() {
         label: "Nom",
         header: () => <TableColumnHeader>Nom</TableColumnHeader>,
         cell: ({ row }) => (
-          <DetailTriggerCell
+          <PageLinkTriggerCell
             label={row.original.name}
             onClick={() =>
               router.push(routes.board.groups.roles(row.original.id))
             }
           >
             <TextCell value={row.original.name} variant="primary" />
-          </DetailTriggerCell>
+          </PageLinkTriggerCell>
         ),
       },
       {

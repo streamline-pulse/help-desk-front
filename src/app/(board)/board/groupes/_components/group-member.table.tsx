@@ -9,6 +9,7 @@ import {
   IconUser,
 } from "@tabler/icons-react"
 
+import { GroupMemberDetailPanel } from "@/app/(board)/board/groupes/_components/group-member.detail.panel"
 import { GroupMemberForm } from "@/app/(board)/board/groupes/_components/group-member.form"
 import {
   buildRowActions,
@@ -16,10 +17,12 @@ import {
 } from "@/components/shared/core-table/cells/actions.cell"
 import { BadgeCell } from "@/components/shared/core-table/cells/badge.cell"
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { DetailTriggerCell } from "@/components/shared/core-table/cells/detail-trigger.cell"
 import { LinkCell } from "@/components/shared/core-table/cells/link.cell"
 import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
 import { TableColumnHeader } from "@/components/shared/core-table/table.column-header"
+import { TableDetailDrawer } from "@/components/shared/core-table/table.detail-drawer"
 import { DeleteConfirmationModal } from "@/components/shared/delete-confirmation.modal"
 import { GlobalModal } from "@/components/shared/global.modal"
 import type {
@@ -27,7 +30,7 @@ import type {
   DataTableRequest,
 } from "@/components/shared/core-table/table.types"
 import { Button } from "@/components/ui/button"
-import { groupDetailUi } from "@/config/group-ui"
+import { useTableDetail } from "@/hooks/use-table-detail"
 import { useGroupRoleListQuery } from "@/hooks/queries/use-group-role.query"
 import {
   useCreateGroupUserMutation,
@@ -51,13 +54,13 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<GroupUser | null>(null)
   const [deleting, setDeleting] = useState<GroupUser | null>(null)
+  const detail = useTableDetail<GroupUser>()
   const membersQuery = useGroupUserListQuery(groupId, listRequest)
   const rolesQuery = useGroupRoleListQuery(groupId, listRequest)
   const usersQuery = useUserListQuery(listRequest)
   const createMutation = useCreateGroupUserMutation(groupId)
   const updateMutation = useUpdateGroupUserMutation(groupId)
   const deleteMutation = useDeleteGroupUserMutation(groupId)
-  const ui = groupDetailUi.membres
 
   const memberUserIds = new Set(
     membersQuery.data?.rows.map((member) => member.userId) ?? []
@@ -75,7 +78,12 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
         ),
         exportValue: memberFullName,
         cell: ({ row }) => (
-          <TextCell value={memberFullName(row.original)} variant="primary" />
+          <DetailTriggerCell
+            label={memberFullName(row.original)}
+            onClick={() => detail.openDetail(row.original)}
+          >
+            <TextCell value={memberFullName(row.original)} variant="primary" />
+          </DetailTriggerCell>
         ),
       },
       {
@@ -119,7 +127,7 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
         ),
       },
     ],
-    []
+    [detail.openDetail]
   )
 
   function useMembersQuery(request: DataTableRequest<Filters>) {
@@ -146,17 +154,12 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
     try {
       await deleteMutation.mutateAsync(deleting.id)
       setDeleting(null)
+      detail.closeDetail()
     } catch {}
   }
 
   return (
     <>
-      <div className="grid gap-1 px-6 pb-4">
-        <h2 className="text-lg font-semibold text-balance">{ui.title}</h2>
-        <p className="text-sm text-pretty text-muted-foreground">
-          {ui.description}
-        </p>
-      </div>
       <DataTable<GroupUser, GroupUser, Filters, PageResult<GroupUser>>
         id={`group-${groupId}-members`}
         query={useMembersQuery}
@@ -195,6 +198,15 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
         export={{ enabled: true, filename: `groupe-${groupId}-membres` }}
         ariaLabel="Membres du groupe"
       />
+      <TableDetailDrawer
+        open={detail.open}
+        onOpenChange={detail.onOpenChange}
+        title={detail.item ? memberFullName(detail.item) : "Membre"}
+        description="Consultez le profil et le rôle de ce membre dans le groupe."
+        actions={detail.item ? getRowActions(detail.item) : undefined}
+      >
+        {detail.item ? <GroupMemberDetailPanel member={detail.item} /> : null}
+      </TableDetailDrawer>
       <GlobalModal
         open={formOpen}
         onOpenChange={(open) => {

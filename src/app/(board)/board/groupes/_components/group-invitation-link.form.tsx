@@ -4,6 +4,7 @@ import { useState } from "react"
 import { IconCopy } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
+import { DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -17,12 +18,14 @@ import { routes } from "@/config/routes"
 import { useGenerateGroupInvitationMutation } from "@/hooks/queries/use-group-invitation.query"
 import type { GroupRole } from "@/types/api/group-role.type"
 
-export function GroupInvitationLinkCard({
+export function GroupInvitationLinkForm({
   groupId,
   roles,
+  onClose,
 }: {
   groupId: string
   roles: GroupRole[]
+  onClose: () => void
 }) {
   const [generateRoleId, setGenerateRoleId] = useState("")
   const [generatedLink, setGeneratedLink] = useState("")
@@ -41,21 +44,18 @@ export function GroupInvitationLinkCard({
   const selectedRole = roles.find((role) => role.id === generateRoleId)
 
   return (
-    <div className="grid gap-3 rounded-lg border bg-muted/20 p-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+    <div className="grid gap-4">
       <div className="grid gap-2">
         <label className="text-sm font-medium" htmlFor="invitation-link-role">
-          Lien d’invitation
+          Rôle attribué via le lien
         </label>
         <Select
           value={generateRoleId}
           onValueChange={(value) => setGenerateRoleId(String(value ?? ""))}
         >
-          <SelectTrigger
-            id="invitation-link-role"
-            className="w-full bg-background"
-          >
-            <SelectValue placeholder="Sélectionner le rôle du lien">
-              {selectedRole?.name ?? "Sélectionner le rôle du lien"}
+          <SelectTrigger id="invitation-link-role" className="w-full">
+            <SelectValue placeholder="Sélectionner un rôle">
+              {selectedRole?.name ?? "Sélectionner un rôle"}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -67,16 +67,8 @@ export function GroupInvitationLinkCard({
           </SelectContent>
         </Select>
       </div>
-      <Button
-        className="self-end"
-        variant="outline"
-        disabled={!generateRoleId || generateMutation.isPending}
-        onClick={() => void generate()}
-      >
-        {generateMutation.isPending ? "Génération…" : "Générer"}
-      </Button>
       {generatedLink ? (
-        <div className="flex gap-2 sm:col-span-2">
+        <div className="flex gap-2">
           <Input
             readOnly
             value={generatedLink}
@@ -92,6 +84,18 @@ export function GroupInvitationLinkCard({
           </IconButton>
         </div>
       ) : null}
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onClose}>
+          Fermer
+        </Button>
+        <Button
+          type="button"
+          disabled={!generateRoleId || generateMutation.isPending}
+          onClick={() => void generate()}
+        >
+          {generateMutation.isPending ? "Génération…" : "Générer le lien"}
+        </Button>
+      </DialogFooter>
     </div>
   )
 }

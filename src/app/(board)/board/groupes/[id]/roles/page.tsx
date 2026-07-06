@@ -1,3 +1,4 @@
+import { GroupDetailSection } from "@/app/(board)/board/groupes/_components/group-detail.section"
 import { GroupRoleTable } from "@/app/(board)/board/groupes/_components/group-role.table"
 
 export default async function GroupRolesPage({
@@ -6,5 +7,10 @@ export default async function GroupRolesPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  return <GroupRoleTable groupId={id} />
+
+  return (
+    <GroupDetailSection groupId={id} section="roles">
+      <GroupRoleTable groupId={id} />
+    </GroupDetailSection>
+  )
 }

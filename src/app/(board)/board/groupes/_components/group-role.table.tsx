@@ -8,6 +8,7 @@ import {
   IconToggleRight,
 } from "@tabler/icons-react"
 
+import { GroupRoleDetailPanel } from "@/app/(board)/board/groupes/_components/group-role.detail.panel"
 import { GroupRoleForm } from "@/app/(board)/board/groupes/_components/group-role.form"
 import {
   buildRowActions,
@@ -15,10 +16,12 @@ import {
 } from "@/components/shared/core-table/cells/actions.cell"
 import { BadgeCell } from "@/components/shared/core-table/cells/badge.cell"
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { DetailTriggerCell } from "@/components/shared/core-table/cells/detail-trigger.cell"
 import { NumberCell } from "@/components/shared/core-table/cells/number.cell"
 import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
 import { TableColumnHeader } from "@/components/shared/core-table/table.column-header"
+import { TableDetailDrawer } from "@/components/shared/core-table/table.detail-drawer"
 import { DeleteConfirmationModal } from "@/components/shared/delete-confirmation.modal"
 import { GlobalModal } from "@/components/shared/global.modal"
 import type {
@@ -26,7 +29,7 @@ import type {
   DataTableRequest,
 } from "@/components/shared/core-table/table.types"
 import { Button } from "@/components/ui/button"
-import { groupDetailUi } from "@/config/group-ui"
+import { useTableDetail } from "@/hooks/use-table-detail"
 import {
   useCreateGroupRoleMutation,
   useDeleteGroupRoleMutation,
@@ -46,12 +49,12 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<GroupRole | null>(null)
   const [deleting, setDeleting] = useState<GroupRole | null>(null)
+  const detail = useTableDetail<GroupRole>()
   const createMutation = useCreateGroupRoleMutation(groupId)
   const updateMutation = useUpdateGroupRoleMutation(groupId)
   const deleteMutation = useDeleteGroupRoleMutation(groupId)
   const modulesQuery = useGroupModuleListQuery(dependencyRequest)
   const permissionsQuery = useGroupPermissionListQuery(dependencyRequest)
-  const ui = groupDetailUi.roles
 
   const columns = useMemo<DataTableColumn<GroupRole>[]>(
     () => [
@@ -60,7 +63,12 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
         label: "Rôle",
         header: () => <TableColumnHeader>Rôle</TableColumnHeader>,
         cell: ({ row }) => (
-          <TextCell value={row.original.name} variant="primary" />
+          <DetailTriggerCell
+            label={row.original.name}
+            onClick={() => detail.openDetail(row.original)}
+          >
+            <TextCell value={row.original.name} variant="primary" />
+          </DetailTriggerCell>
         ),
       },
       {
@@ -101,7 +109,7 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
         ),
       },
     ],
-    []
+    [detail.openDetail]
   )
 
   function useRolesQuery(request: DataTableRequest<Filters>) {
@@ -132,17 +140,12 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
     try {
       await deleteMutation.mutateAsync(deleting.id)
       setDeleting(null)
+      detail.closeDetail()
     } catch {}
   }
 
   return (
     <>
-      <div className="grid gap-1 px-6 pb-4">
-        <h2 className="text-lg font-semibold text-balance">{ui.title}</h2>
-        <p className="text-sm text-pretty text-muted-foreground">
-          {ui.description}
-        </p>
-      </div>
       <DataTable<GroupRole, GroupRole, Filters, PageResult<GroupRole>>
         id={`group-${groupId}-roles`}
         query={useRolesQuery}
@@ -180,6 +183,16 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
         export={{ enabled: true, filename: `groupe-${groupId}-roles` }}
         ariaLabel="Rôles du groupe"
       />
+      <TableDetailDrawer
+        open={detail.open}
+        onOpenChange={detail.onOpenChange}
+        title={detail.item?.name ?? "Rôle"}
+        description="Consultez les permissions et la portée de ce rôle."
+        size="lg"
+        actions={detail.item ? getRowActions(detail.item) : undefined}
+      >
+        {detail.item ? <GroupRoleDetailPanel role={detail.item} /> : null}
+      </TableDetailDrawer>
       <GlobalModal
         open={formOpen}
         onOpenChange={(open) => {

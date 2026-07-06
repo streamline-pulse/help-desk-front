@@ -2,21 +2,29 @@
 
 import { useMemo, useState } from "react"
 import {
+  IconChevronDown,
   IconClock,
+  IconLink,
   IconMail,
   IconMailPlus,
   IconShield,
   IconToggleRight,
 } from "@tabler/icons-react"
 
+import { GroupInvitationDetailPanel } from "@/app/(board)/board/groupes/_components/group-invitation.detail.panel"
 import { GroupInvitationForm } from "@/app/(board)/board/groupes/_components/group-invitation.form"
-import { GroupInvitationLinkCard } from "@/app/(board)/board/groupes/_components/group-invitation-link.card"
-import { TableActionsCell } from "@/components/shared/core-table/cells/actions.cell"
+import { GroupInvitationLinkForm } from "@/app/(board)/board/groupes/_components/group-invitation-link.form"
+import {
+  buildRowActions,
+  TableActionsCell,
+} from "@/components/shared/core-table/cells/actions.cell"
 import { BadgeCell } from "@/components/shared/core-table/cells/badge.cell"
 import { DateCell } from "@/components/shared/core-table/cells/date.cell"
+import { DetailTriggerCell } from "@/components/shared/core-table/cells/detail-trigger.cell"
 import { TextCell } from "@/components/shared/core-table/cells/text.cell"
 import { DataTable } from "@/components/shared/core-table/core.table"
 import { TableColumnHeader } from "@/components/shared/core-table/table.column-header"
+import { TableDetailDrawer } from "@/components/shared/core-table/table.detail-drawer"
 import { DeleteConfirmationModal } from "@/components/shared/delete-confirmation.modal"
 import { GlobalModal } from "@/components/shared/global.modal"
 import type {
@@ -25,7 +33,13 @@ import type {
   DataTableRequest,
 } from "@/components/shared/core-table/table.types"
 import { Button } from "@/components/ui/button"
-import { groupDetailUi } from "@/config/group-ui"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useTableDetail } from "@/hooks/use-table-detail"
 import {
   useCreateGroupInvitationMutation,
   useDeleteGroupInvitationMutation,
@@ -57,13 +71,20 @@ function invitationStatus(invitation: GroupInvitation) {
   return "Active"
 }
 
+function invitationLabel(invitation: GroupInvitation) {
+  return invitation.email ?? "Lien partageable"
+}
+
 export function GroupInvitationTable({ groupId }: { groupId: string }) {
   const [formOpen, setFormOpen] = useState(false)
+  const [linkModalOpen, setLinkModalOpen] = useState(false)
   const [deleting, setDeleting] = useState<GroupInvitation | null>(null)
+  const detail = useTableDetail<GroupInvitation>()
   const rolesQuery = useGroupRoleListQuery(groupId, listRequest)
   const createMutation = useCreateGroupInvitationMutation(groupId)
   const deleteMutation = useDeleteGroupInvitationMutation(groupId)
-  const ui = groupDetailUi.invitations
+  const roles = rolesQuery.data?.rows ?? []
+  const hasRoles = roles.length > 0
 
   const filters = useMemo<DataTableFilter<InvitationFilters>[]>(
     () => [
@@ -89,13 +110,17 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
         header: () => (
           <TableColumnHeader icon={IconMail}>Destinataire</TableColumnHeader>
         ),
-        exportValue: (invitation) =>
-          invitation.email ?? "Lien partageable",
+        exportValue: invitationLabel,
         cell: ({ row }) => (
-          <TextCell
-            value={row.original.email ?? "Lien partageable"}
-            variant="primary"
-          />
+          <DetailTriggerCell
+            label={invitationLabel(row.original)}
+            onClick={() => detail.openDetail(row.original)}
+          >
+            <TextCell
+              value={invitationLabel(row.original)}
+              variant="primary"
+            />
+          </DetailTriggerCell>
         ),
       },
       {
@@ -137,7 +162,7 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
         ),
       },
     ],
-    []
+    [detail.openDetail]
   )
 
   function useInvitationsQuery(request: DataTableRequest<InvitationFilters>) {
@@ -151,28 +176,28 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
     return useGroupInvitationListQuery(groupId, status, request)
   }
 
+  function getRowActions(invitation: GroupInvitation) {
+    return buildRowActions({
+      label: invitationLabel(invitation),
+      onDelete: () => {
+        deleteMutation.reset()
+        setDeleting(invitation)
+      },
+      deleteLabel: `Supprimer ${invitationLabel(invitation)}`,
+    })
+  }
+
   async function confirmDelete() {
     if (!deleting) return
     try {
       await deleteMutation.mutateAsync(deleting.id)
       setDeleting(null)
+      detail.closeDetail()
     } catch {}
   }
 
   return (
     <>
-      <div className="grid gap-4 px-6 pb-4">
-        <div>
-          <h2 className="text-lg font-semibold text-balance">{ui.title}</h2>
-          <p className="text-sm text-pretty text-muted-foreground">
-            {ui.description}
-          </p>
-        </div>
-        <GroupInvitationLinkCard
-          groupId={groupId}
-          roles={rolesQuery.data?.rows ?? []}
-        />
-      </div>
       <DataTable<
         GroupInvitation,
         GroupInvitation,
@@ -199,27 +224,46 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
           serverSorting: false,
         }}
         toolbarActions={
-          <Button
-            size="sm"
-            disabled={!rolesQuery.data?.rows.length}
-            onClick={() => setFormOpen(true)}
-          >
-            <IconMailPlus />
-            Inviter par e-mail
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              disabled={!hasRoles}
+              render={
+                <Button size="sm" disabled={!hasRoles}>
+                  <IconMailPlus />
+                  Inviter
+                  <IconChevronDown data-icon="inline-end" />
+                </Button>
+              }
+            />
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem onClick={() => setFormOpen(true)}>
+                <IconMail />
+                Par e-mail
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLinkModalOpen(true)}>
+                <IconLink />
+                Générer un lien
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         }
         rowActions={(invitation) => (
-          <TableActionsCell
-            label={invitation.email ?? "cette invitation"}
-            onDelete={() => {
-              deleteMutation.reset()
-              setDeleting(invitation)
-            }}
-          />
+          <TableActionsCell actions={getRowActions(invitation)} />
         )}
         export={{ enabled: true, filename: `groupe-${groupId}-invitations` }}
         ariaLabel="Invitations du groupe"
       />
+      <TableDetailDrawer
+        open={detail.open}
+        onOpenChange={detail.onOpenChange}
+        title={detail.item ? invitationLabel(detail.item) : "Invitation"}
+        description="Consultez le statut et les informations de cette invitation."
+        actions={detail.item ? getRowActions(detail.item) : undefined}
+      >
+        {detail.item ? (
+          <GroupInvitationDetailPanel invitation={detail.item} />
+        ) : null}
+      </TableDetailDrawer>
       <GlobalModal
         open={formOpen}
         onOpenChange={setFormOpen}
@@ -228,9 +272,24 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
         preventClose={createMutation.isPending}
       >
         <GroupInvitationForm
-          roles={rolesQuery.data?.rows ?? []}
+          roles={roles}
           mutation={createMutation}
           onClose={() => setFormOpen(false)}
+        />
+      </GlobalModal>
+      <GlobalModal
+        open={linkModalOpen}
+        onOpenChange={setLinkModalOpen}
+        title="Générer un lien d’invitation"
+        description="Sélectionnez le rôle attribué lors de l’acceptation, puis partagez le lien généré."
+        contentClassName="sm:max-w-lg"
+        preventClose={false}
+      >
+        <GroupInvitationLinkForm
+          key={linkModalOpen ? "open" : "closed"}
+          groupId={groupId}
+          roles={roles}
+          onClose={() => setLinkModalOpen(false)}
         />
       </GlobalModal>
       <DeleteConfirmationModal
