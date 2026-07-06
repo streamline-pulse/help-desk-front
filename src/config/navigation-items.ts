@@ -31,6 +31,7 @@ export const moduleCodes = {
   configuration: "CONFIGURATION",
   roles: "ROLES",
   groupConfiguration: "GROUP_CONFIGURATION",
+  groups: "GROUPS",
 } as const
 
 export type ModuleCode = (typeof moduleCodes)[keyof typeof moduleCodes]
@@ -70,6 +71,13 @@ export const navigationItems = [
     url: routes.board.roles.root,
     icon: IconShieldLock,
     moduleCode: moduleCodes.roles,
+    isReady: true,
+  },
+  {
+    title: "Groupes",
+    url: routes.board.groups.root,
+    icon: IconUsersGroup,
+    moduleCode: moduleCodes.groups,
     isReady: true,
   },
   {

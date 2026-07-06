@@ -7,6 +7,10 @@ import { toast } from "sonner"
 
 import { BoardSearchCommand } from "@/components/shared/navigation/board-search-command"
 import {
+  getBoardBreadcrumbs,
+  getGroupIdFromPathname,
+} from "@/config/board-breadcrumbs"
+import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -26,6 +30,7 @@ import { Kbd } from "@/components/ui/kbd"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { routes } from "@/config/routes"
+import { useGroupQuery } from "@/hooks/queries/use-group.query"
 import {
   IconChevronDown,
   IconClock,
@@ -39,27 +44,8 @@ import {
   IconStar,
 } from "@tabler/icons-react"
 
-const boardBreadcrumbs: Record<string, { label: string; href?: string }[]> = {
-  [routes.board.root]: [
-    { label: "Help Desk", href: routes.board.root },
-    { label: "Board" },
-  ],
-  [routes.board.employees]: [
-    { label: "Help Desk", href: routes.board.root },
-    { label: "Board", href: routes.board.root },
-    { label: "Employees" },
-  ],
-}
-
-function getBreadcrumbs(pathname: string) {
-  if (boardBreadcrumbs[pathname]) {
-    return boardBreadcrumbs[pathname]
-  }
-
-  return [
-    { label: "Help Desk", href: routes.board.root },
-    { label: "Board", href: routes.board.root },
-  ]
+function getBreadcrumbs(pathname: string, groupName?: string) {
+  return getBoardBreadcrumbs(pathname, { groupName })
 }
 
 function DigitalClock() {
@@ -95,7 +81,9 @@ export function SiteHeader() {
   const router = useRouter()
   const { toggleSidebar } = useSidebar()
   const [searchOpen, setSearchOpen] = useState(false)
-  const breadcrumbs = getBreadcrumbs(pathname)
+  const groupId = getGroupIdFromPathname(pathname)
+  const groupQuery = useGroupQuery(groupId ?? "")
+  const breadcrumbs = getBreadcrumbs(pathname, groupQuery.data?.name)
   const isEmployeesPage = pathname === routes.board.employees
 
   async function handleCopyPageLink() {
@@ -129,7 +117,10 @@ export function SiteHeader() {
                 const isLast = index === breadcrumbs.length - 1
 
                 return (
-                  <span key={crumb.label} className="contents">
+                  <span
+                    key={`${crumb.label}-${index}`}
+                    className="contents"
+                  >
                     <BreadcrumbItem>
                       {isLast || !crumb.href ? (
                         <BreadcrumbPage>{crumb.label}</BreadcrumbPage>

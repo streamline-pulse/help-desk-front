@@ -15,6 +15,13 @@ export const routes = {
       root: "/board/group-configuration",
       resource: (resource: string) => `/board/group-configuration/${resource}`,
     },
+    groups: {
+      root: "/board/groupes",
+      detail: (id: string) => `/board/groupes/${id}`,
+      roles: (id: string) => `/board/groupes/${id}/roles`,
+      members: (id: string) => `/board/groupes/${id}/membres`,
+      invitations: (id: string) => `/board/groupes/${id}/invitations`,
+    },
     users: "/board/utilisateurs",
   },
 
