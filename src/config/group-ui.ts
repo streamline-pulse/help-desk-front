@@ -1,5 +1,6 @@
 import type { TablerIcon } from "@tabler/icons-react"
 import {
+  IconFiles,
   IconMailPlus,
   IconShield,
   IconUsers,
@@ -9,6 +10,7 @@ export const groupDetailMenuResources = [
   "roles",
   "membres",
   "invitations",
+  "fichiers",
 ] as const
 
 export type GroupDetailResource =
@@ -35,5 +37,11 @@ export const groupDetailUi: Record<
     description:
       "Invitez par e-mail ou générez un lien à partager manuellement.",
     icon: IconMailPlus,
+  },
+  fichiers: {
+    title: "Fichiers",
+    description:
+      "Centralisez les documents et pièces jointes utiles à ce groupe.",
+    icon: IconFiles,
   },
 }

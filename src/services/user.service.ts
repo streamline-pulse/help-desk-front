@@ -2,6 +2,10 @@ import { requestApi } from "@/lib/browser-api-client"
 import { normalizeMutation, normalizePage } from "@/lib/api-response"
 import type { CreateUserInput, UpdateUserInput } from "@/schemas/user.schema"
 import type {
+  ProfileInformationInput,
+  ProfileSecurityInput,
+} from "@/schemas/profile.schema"
+import type {
   ApiEntityResponse,
   ApiListParams,
   ApiPagedResponse,
@@ -35,6 +39,16 @@ export const userService = {
     normalizeMutation(
       await requestApi<ApiEntityResponse<User>>(
         `${ENDPOINT}/${encodeURIComponent(id)}`,
+        { method: "put", json: input }
+      )
+    ),
+  updateMe: async (
+    id: string,
+    input: Partial<ProfileInformationInput & ProfileSecurityInput>
+  ) =>
+    normalizeMutation(
+      await requestApi<ApiEntityResponse<User>>(
+        `${ENDPOINT}/me/${encodeURIComponent(id)}`,
         { method: "put", json: input }
       )
     ),

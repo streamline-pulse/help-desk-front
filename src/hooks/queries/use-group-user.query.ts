@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 
+import { useCurrentUserQuery } from "@/hooks/queries/use-auth.query"
 import { groupRoleQueryKeys } from "@/hooks/queries/use-group-role.query"
 import { useApiMutation } from "@/hooks/use-api-mutation"
 import type { CreateGroupUserInput, UpdateGroupUserInput } from "@/schemas/group-user.schema"
@@ -9,11 +10,41 @@ import type { ApiListParams } from "@/types/api/api-data.type"
 export const groupUserQueryKeys = {
   all: ["group-users"] as const,
   byGroup: (groupId: string) => [...groupUserQueryKeys.all, groupId] as const,
-  list: (groupId: string, request: ApiListParams) => [...groupUserQueryKeys.byGroup(groupId), "list", request] as const,
+  list: (groupId: string, request: ApiListParams<{ roleId?: string }>) => [...groupUserQueryKeys.byGroup(groupId), "list", request] as const,
+  detail: (groupId: string, userId: string) => [...groupUserQueryKeys.byGroup(groupId), "detail", userId] as const,
+  current: (groupId: string, userId: string) => [...groupUserQueryKeys.byGroup(groupId), "current", userId] as const,
 }
 
-export function useGroupUserListQuery(groupId: string, request: ApiListParams, enabled = true) {
+export function useGroupUserListQuery(groupId: string, request: ApiListParams<{ roleId?: string }>, enabled = true) {
   return useQuery({ queryKey: groupUserQueryKeys.list(groupId, request), queryFn: ({ signal }) => groupUserService.list(groupId, request, signal), placeholderData: (previous) => previous, enabled: enabled && Boolean(groupId) })
+}
+
+export function useGroupUserDetailQuery(
+  groupId: string,
+  userId: string,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: groupUserQueryKeys.detail(groupId, userId),
+    queryFn: ({ signal }) => groupUserService.get(groupId, userId, signal),
+    enabled: enabled && Boolean(groupId) && Boolean(userId),
+  })
+}
+
+export function useCurrentGroupUserQuery(groupId: string, enabled = true) {
+  const currentUserQuery = useCurrentUserQuery()
+  const currentUserId = currentUserQuery.data?.id ?? ""
+
+  return useQuery({
+    queryKey: groupUserQueryKeys.current(groupId, currentUserId),
+    queryFn: ({ signal }) =>
+      groupUserService.getCurrent(groupId, currentUserId, signal),
+    enabled:
+      enabled &&
+      Boolean(groupId) &&
+      Boolean(currentUserId) &&
+      !currentUserQuery.isPending,
+  })
 }
 
 export function useCreateGroupUserMutation(groupId: string) {

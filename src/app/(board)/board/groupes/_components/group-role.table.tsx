@@ -38,8 +38,10 @@ import {
 } from "@/hooks/queries/use-group-role.query"
 import { useGroupModuleListQuery } from "@/hooks/queries/use-group-module.query"
 import { useGroupPermissionListQuery } from "@/hooks/queries/use-group-permission.query"
+import { useCurrentGroupUserQuery } from "@/hooks/queries/use-group-user.query"
 import type { PageResult } from "@/types/api/api-data.type"
 import type { GroupRole } from "@/types/api/group-role.type"
+import { hasGroupPermission } from "@/utils/group-permissions"
 
 type Filters = Record<string, never>
 
@@ -50,11 +52,28 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
   const [editing, setEditing] = useState<GroupRole | null>(null)
   const [deleting, setDeleting] = useState<GroupRole | null>(null)
   const detail = useTableDetail<GroupRole>()
+  const openDetail = detail.openDetail
   const createMutation = useCreateGroupRoleMutation(groupId)
   const updateMutation = useUpdateGroupRoleMutation(groupId)
   const deleteMutation = useDeleteGroupRoleMutation(groupId)
   const modulesQuery = useGroupModuleListQuery(dependencyRequest)
   const permissionsQuery = useGroupPermissionListQuery(dependencyRequest)
+  const currentGroupUserQuery = useCurrentGroupUserQuery(groupId)
+  const canCreateRoles = hasGroupPermission(
+    currentGroupUserQuery.data?.user,
+    "groups-roles",
+    "create"
+  )
+  const canUpdateRoles = hasGroupPermission(
+    currentGroupUserQuery.data?.user,
+    "groups-roles",
+    "update"
+  )
+  const canDeleteRoles = hasGroupPermission(
+    currentGroupUserQuery.data?.user,
+    "groups-roles",
+    "delete"
+  )
 
   const columns = useMemo<DataTableColumn<GroupRole>[]>(
     () => [
@@ -65,7 +84,7 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
         cell: ({ row }) => (
           <DetailTriggerCell
             label={row.original.name}
-            onClick={() => detail.openDetail(row.original)}
+            onClick={() => openDetail(row.original)}
           >
             <TextCell value={row.original.name} variant="primary" />
           </DetailTriggerCell>
@@ -109,7 +128,7 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
         ),
       },
     ],
-    [detail.openDetail]
+    [openDetail]
   )
 
   function useRolesQuery(request: DataTableRequest<Filters>) {
@@ -119,13 +138,13 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
   function getRowActions(role: GroupRole) {
     return buildRowActions({
       label: role.name,
-      onEdit: role.editable
+      onEdit: role.editable && canUpdateRoles
         ? () => {
             setEditing(role)
             setFormOpen(true)
           }
         : undefined,
-      onDelete: role.editable
+      onDelete: role.editable && canDeleteRoles
         ? () => {
             deleteMutation.reset()
             setDeleting(role)
@@ -168,6 +187,7 @@ export function GroupRoleTable({ groupId }: { groupId: string }) {
         toolbarActions={
           <Button
             size="sm"
+            disabled={!canCreateRoles}
             onClick={() => {
               setEditing(null)
               setFormOpen(true)

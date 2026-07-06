@@ -19,6 +19,8 @@ function groupResourceHref(groupId: string, resource: GroupDetailResource) {
       return routes.board.groups.members(groupId)
     case "invitations":
       return routes.board.groups.invitations(groupId)
+    case "fichiers":
+      return routes.board.groups.files(groupId)
   }
 }
 

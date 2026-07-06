@@ -2,6 +2,7 @@ export const routes = {
   home: "/",
   board: {
     root: "/board",
+    profile: "/board/profil",
     employees: "/board/employees",
     configuration: {
       root: "/board/configuration",
@@ -21,6 +22,7 @@ export const routes = {
       roles: (id: string) => `/board/groupes/${id}/roles`,
       members: (id: string) => `/board/groupes/${id}/membres`,
       invitations: (id: string) => `/board/groupes/${id}/invitations`,
+      files: (id: string) => `/board/groupes/${id}/fichiers`,
     },
     users: "/board/utilisateurs",
   },

@@ -114,9 +114,9 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(routes.board.profile)}>
                 <IconRosetteDiscountCheck />
-                Account
+                Profil
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconCreditCard />

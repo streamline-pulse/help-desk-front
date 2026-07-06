@@ -2,7 +2,9 @@
 
 import { GroupDetailPageHeader } from "@/app/(board)/board/groupes/_components/group-detail.page-header"
 import { GroupNav } from "@/app/(board)/board/groupes/_components/group-nav"
+import { Badge } from "@/components/ui/badge"
 import type { GroupDetailResource } from "@/config/group-ui"
+import { useCurrentGroupUserQuery } from "@/hooks/queries/use-group-user.query"
 
 export function GroupDetailSection({
   groupId,
@@ -13,10 +15,18 @@ export function GroupDetailSection({
   section: GroupDetailResource
   children: React.ReactNode
 }) {
+  const currentGroupUserQuery = useCurrentGroupUserQuery(groupId)
+  const currentRole = currentGroupUserQuery.data?.user?.role.name
+
   return (
     <>
       <GroupDetailPageHeader groupId={groupId} section={section} />
       <GroupNav groupId={groupId} />
+      {currentRole ? (
+        <div className="px-6 pb-4">
+          <Badge variant="outline">Votre role dans ce groupe : {currentRole}</Badge>
+        </div>
+      ) : null}
       {children}
     </>
   )

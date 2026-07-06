@@ -27,6 +27,7 @@ import { DeleteConfirmationModal } from "@/components/shared/delete-confirmation
 import { GlobalModal } from "@/components/shared/global.modal"
 import type {
   DataTableColumn,
+  DataTableFilter,
   DataTableRequest,
 } from "@/components/shared/core-table/table.types"
 import { Button } from "@/components/ui/button"
@@ -34,6 +35,7 @@ import { useTableDetail } from "@/hooks/use-table-detail"
 import { useGroupRoleListQuery } from "@/hooks/queries/use-group-role.query"
 import {
   useCreateGroupUserMutation,
+  useCurrentGroupUserQuery,
   useDeleteGroupUserMutation,
   useGroupUserListQuery,
   useUpdateGroupUserMutation,
@@ -41,8 +43,11 @@ import {
 import { useUserListQuery } from "@/hooks/queries/use-user.query"
 import type { PageResult } from "@/types/api/api-data.type"
 import type { GroupUser } from "@/types/api/group-user.type"
+import { hasGroupPermission } from "@/utils/group-permissions"
 
-type Filters = Record<string, never>
+type Filters = {
+  roleId?: string
+}
 
 const listRequest = { page: 1, perPage: 100, filters: {} }
 
@@ -55,18 +60,55 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
   const [editing, setEditing] = useState<GroupUser | null>(null)
   const [deleting, setDeleting] = useState<GroupUser | null>(null)
   const detail = useTableDetail<GroupUser>()
+  const openDetail = detail.openDetail
   const membersQuery = useGroupUserListQuery(groupId, listRequest)
   const rolesQuery = useGroupRoleListQuery(groupId, listRequest)
   const usersQuery = useUserListQuery(listRequest)
+  const currentGroupUserQuery = useCurrentGroupUserQuery(groupId)
   const createMutation = useCreateGroupUserMutation(groupId)
   const updateMutation = useUpdateGroupUserMutation(groupId)
   const deleteMutation = useDeleteGroupUserMutation(groupId)
+  const canCreateMembers = hasGroupPermission(
+    currentGroupUserQuery.data?.user,
+    "groups-users",
+    "create"
+  )
+  const canUpdateMembers = hasGroupPermission(
+    currentGroupUserQuery.data?.user,
+    "groups-users",
+    "update"
+  )
+  const canDeleteMembers = hasGroupPermission(
+    currentGroupUserQuery.data?.user,
+    "groups-users",
+    "delete"
+  )
 
   const memberUserIds = new Set(
     membersQuery.data?.rows.map((member) => member.userId) ?? []
   )
   const availableUsers =
     usersQuery.data?.rows.filter((user) => !memberUserIds.has(user.id)) ?? []
+  const filters = useMemo<DataTableFilter<Filters>[]>(
+    () => {
+      const roleOptions =
+        rolesQuery.data?.rows.map((role) => ({
+          value: role.id,
+          label: role.name,
+        })) ?? []
+
+      return [
+        {
+          key: "roleId",
+          type: "select",
+          label: "Rôle",
+          placeholder: "Tous les rôles",
+          options: roleOptions,
+        },
+      ]
+    },
+    [rolesQuery.data?.rows]
+  )
 
   const columns = useMemo<DataTableColumn<GroupUser>[]>(
     () => [
@@ -80,7 +122,7 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
         cell: ({ row }) => (
           <DetailTriggerCell
             label={memberFullName(row.original)}
-            onClick={() => detail.openDetail(row.original)}
+            onClick={() => openDetail(row.original)}
           >
             <TextCell value={memberFullName(row.original)} variant="primary" />
           </DetailTriggerCell>
@@ -127,7 +169,7 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
         ),
       },
     ],
-    [detail.openDetail]
+    [openDetail]
   )
 
   function useMembersQuery(request: DataTableRequest<Filters>) {
@@ -137,14 +179,18 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
   function getRowActions(member: GroupUser) {
     return buildRowActions({
       label: memberFullName(member),
-      onEdit: () => {
-        setEditing(member)
-        setFormOpen(true)
-      },
-      onDelete: () => {
-        deleteMutation.reset()
-        setDeleting(member)
-      },
+      onEdit: canUpdateMembers
+        ? () => {
+            setEditing(member)
+            setFormOpen(true)
+          }
+        : undefined,
+      onDelete: canDeleteMembers
+        ? () => {
+            deleteMutation.reset()
+            setDeleting(member)
+          }
+        : undefined,
       deleteLabel: `Retirer ${memberFullName(member)}`,
     })
   }
@@ -165,6 +211,7 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
         query={useMembersQuery}
         responseAdapter={(response) => response}
         columns={columns}
+        filters={filters}
         getRowId={(member) => member.id}
         defaultPageSize={25}
         pageSizeOptions={[10, 25, 50, 100]}
@@ -176,13 +223,13 @@ export function GroupMemberTable({ groupId }: { groupId: string }) {
         capabilities={{
           pagination: true,
           search: true,
-          filters: false,
+          filters: true,
           serverSorting: false,
         }}
         toolbarActions={
           <Button
             size="sm"
-            disabled={!rolesQuery.data?.rows.length}
+            disabled={!rolesQuery.data?.rows.length || !canCreateMembers}
             onClick={() => {
               setEditing(null)
               setFormOpen(true)

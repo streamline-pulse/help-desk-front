@@ -46,11 +46,13 @@ import {
   useGroupInvitationListQuery,
 } from "@/hooks/queries/use-group-invitation.query"
 import { useGroupRoleListQuery } from "@/hooks/queries/use-group-role.query"
+import { useCurrentGroupUserQuery } from "@/hooks/queries/use-group-user.query"
 import type { PageResult } from "@/types/api/api-data.type"
 import type {
   GroupInvitation,
   GroupInvitationStatus,
 } from "@/types/api/group-invitation.type"
+import { hasGroupPermission } from "@/utils/group-permissions"
 
 type InvitationFilters = {
   status?: GroupInvitationStatus
@@ -80,11 +82,23 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
   const [linkModalOpen, setLinkModalOpen] = useState(false)
   const [deleting, setDeleting] = useState<GroupInvitation | null>(null)
   const detail = useTableDetail<GroupInvitation>()
+  const openDetail = detail.openDetail
   const rolesQuery = useGroupRoleListQuery(groupId, listRequest)
+  const currentGroupUserQuery = useCurrentGroupUserQuery(groupId)
   const createMutation = useCreateGroupInvitationMutation(groupId)
   const deleteMutation = useDeleteGroupInvitationMutation(groupId)
   const roles = rolesQuery.data?.rows ?? []
   const hasRoles = roles.length > 0
+  const canCreateInvitations = hasGroupPermission(
+    currentGroupUserQuery.data?.user,
+    "groups-users-invitations",
+    "create"
+  )
+  const canDeleteInvitations = hasGroupPermission(
+    currentGroupUserQuery.data?.user,
+    "groups-users-invitations",
+    "delete"
+  )
 
   const filters = useMemo<DataTableFilter<InvitationFilters>[]>(
     () => [
@@ -114,7 +128,7 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
         cell: ({ row }) => (
           <DetailTriggerCell
             label={invitationLabel(row.original)}
-            onClick={() => detail.openDetail(row.original)}
+            onClick={() => openDetail(row.original)}
           >
             <TextCell
               value={invitationLabel(row.original)}
@@ -162,7 +176,7 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
         ),
       },
     ],
-    [detail.openDetail]
+    [openDetail]
   )
 
   function useInvitationsQuery(request: DataTableRequest<InvitationFilters>) {
@@ -179,10 +193,12 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
   function getRowActions(invitation: GroupInvitation) {
     return buildRowActions({
       label: invitationLabel(invitation),
-      onDelete: () => {
-        deleteMutation.reset()
-        setDeleting(invitation)
-      },
+      onDelete: canDeleteInvitations
+        ? () => {
+            deleteMutation.reset()
+            setDeleting(invitation)
+          }
+        : undefined,
       deleteLabel: `Supprimer ${invitationLabel(invitation)}`,
     })
   }
@@ -226,9 +242,9 @@ export function GroupInvitationTable({ groupId }: { groupId: string }) {
         toolbarActions={
           <DropdownMenu>
             <DropdownMenuTrigger
-              disabled={!hasRoles}
+              disabled={!hasRoles || !canCreateInvitations}
               render={
-                <Button size="sm" disabled={!hasRoles}>
+                <Button size="sm" disabled={!hasRoles || !canCreateInvitations}>
                   <IconMailPlus />
                   Inviter
                   <IconChevronDown data-icon="inline-end" />
