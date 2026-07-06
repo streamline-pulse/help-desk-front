@@ -51,7 +51,7 @@ jobs:
           repository: YALA-Events/yala-events-kube-configs
           ref: ${{env.NAMESPACE}}
           path: yala-events-kube-configs
-          token: ${{secrets.PAT_SLP_KUBE_CONFIGS}}
+          token: ${{secrets.PAT_YE_KUBE_CONFIGS}}
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
