@@ -197,6 +197,41 @@ export function isNavigationLinkItem(
   return item.type === "link"
 }
 
+export type NavigationSearchGroup = {
+  heading: string
+  items: NavigationLinkItem[]
+}
+
+export function getNavigationSearchGroups(
+  options?: { includeUnavailable?: boolean }
+): NavigationSearchGroup[] {
+  const includeUnavailable = options?.includeUnavailable ?? false
+  const groups: NavigationSearchGroup[] = []
+  let currentHeading = "Navigation"
+
+  for (const item of navigationItems) {
+    if (!isNavigationLinkItem(item)) {
+      currentHeading = item.title
+      continue
+    }
+
+    if (!includeUnavailable && !item.isReady) {
+      continue
+    }
+
+    const lastGroup = groups.at(-1)
+
+    if (!lastGroup || lastGroup.heading !== currentHeading) {
+      groups.push({ heading: currentHeading, items: [item] })
+      continue
+    }
+
+    lastGroup.items.push(item)
+  }
+
+  return groups
+}
+
 export function isModuleRouteAvailable(pathname: string) {
   const matchingItem = navigationItems.reduce<NavigationLinkItem | undefined>(
     (currentMatch, item) => {

@@ -3,7 +3,6 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 
-import { employees } from "@/app/(board)/board/employees/_components/employee-mock-data"
 import {
   Command,
   CommandDialog,
@@ -14,14 +13,15 @@ import {
   CommandList,
   CommandShortcut,
 } from "@/components/ui/command"
-import { routes } from "@/config/routes"
+import { getNavigationSearchGroups } from "@/config/navigation-items"
 import { emitOnboardingEvent, onboardingEvents } from "@/lib/onboarding-events"
-import { IconLayoutDashboard, IconUsers } from "@tabler/icons-react"
 
 type BoardSearchCommandProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
+
+const navigationSearchGroups = getNavigationSearchGroups()
 
 export function BoardSearchCommand({
   open,
@@ -49,9 +49,9 @@ export function BoardSearchCommand({
     return () => document.removeEventListener("keydown", handleKeyDown)
   }, [onOpenChange])
 
-  function handleSelectEmployee() {
+  function handleNavigate(url: string) {
     onOpenChange(false)
-    router.push(routes.board.employees)
+    router.push(url)
   }
 
   return (
@@ -59,50 +59,31 @@ export function BoardSearchCommand({
       open={open}
       onOpenChange={onOpenChange}
       title="Recherche"
-      description="Rechercher une page ou un employé"
+      description="Rechercher une page"
     >
       <Command>
-        <CommandInput placeholder="Rechercher une page ou un employé…" />
+        <CommandInput placeholder="Rechercher une page…" />
         <CommandList>
           <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
-          <CommandGroup heading="Navigation">
-            <CommandItem
-              value="employees employee management"
-              onSelect={() => {
-                onOpenChange(false)
-                router.push(routes.board.employees)
-              }}
-            >
-              <IconUsers />
-              Gestion des employés
-              <CommandShortcut>↵</CommandShortcut>
-            </CommandItem>
-            <CommandItem
-              value="board home"
-              onSelect={() => {
-                onOpenChange(false)
-                router.push(routes.board.root)
-              }}
-            >
-              <IconLayoutDashboard />
-              Vue d’ensemble
-            </CommandItem>
-          </CommandGroup>
-          <CommandGroup heading="Employés">
-            {employees.map((employee) => (
-              <CommandItem
-                key={employee.id}
-                value={`${employee.id} ${employee.firstName} ${employee.lastName} ${employee.department} ${employee.email}`}
-                onSelect={handleSelectEmployee}
-              >
-                <IconUsers />
-                <span>
-                  {employee.firstName} {employee.lastName}
-                </span>
-                <span className="text-muted-foreground">{employee.id}</span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {navigationSearchGroups.map((group) => (
+            <CommandGroup key={group.heading} heading={group.heading}>
+              {group.items.map((item) => {
+                const Icon = item.icon
+
+                return (
+                  <CommandItem
+                    key={item.moduleCode}
+                    value={`${item.title} ${item.url} ${item.moduleCode}`}
+                    onSelect={() => handleNavigate(item.url)}
+                  >
+                    <Icon />
+                    {item.title}
+                    <CommandShortcut>↵</CommandShortcut>
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          ))}
         </CommandList>
       </Command>
     </CommandDialog>
